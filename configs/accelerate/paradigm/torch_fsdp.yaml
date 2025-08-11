@@ -1,0 +1,22 @@
+# @package _global_
+use_deepspeed: false
+use_fsdp: true
+use_parallelism_config: false
+use_megatron_lm: false
+use_xpu: false
+
+# FSDP recommended starter settings
+fsdp_version: "1" # '1' stable; switch to '2' to test new stack
+fsdp_sharding_strategy: FULL_SHARD # FULL_SHARD | SHARD_GRAD_OP | NO_SHARD etc.
+fsdp_offload_params: "false" # 'true' only if GPU mem tight (adds H2D latency)
+fsdp_min_num_params: 1e+8 # Auto-wrap threshold (adjust for model size)
+fsdp_reshard_after_forward: "true" # Free full params ASAP to save memory
+fsdp_forward_prefetch: "false" # Enable later if profiling shows benefit
+fsdp_use_orig_params: "true" # Keeps original param objects (safer debugging)
+fsdp_cpu_ram_efficient_loading: "true" # Stream load large checkpoints
+fsdp_sync_module_states: "true" # Sync on init (multi-rank consistent)
+fsdp_activation_checkpointing: "false" # Turn on when memory bound
+fsdp_auto_wrap_policy: null # Provide policy name or leave null
+fsdp_transformer_layer_cls_to_wrap: null # Comma list of layer class names if using auto wrap
+fsdp_backward_prefetch: null # BACKWARD_PRE / BACKWARD_POST when enabling overlap
+fsdp_state_dict_type: null # SHARDED_STATE_DICT | FULL_STATE_DICT | HYBRID

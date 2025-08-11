@@ -1,0 +1,6 @@
+# @package _global_
+dynamo_backend: "inductor"
+dynamo_mode: "default"
+dynamo_use_fullgraph: false
+dynamo_use_dynamic: false
+dynamo_use_regional_compilation: false

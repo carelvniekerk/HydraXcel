@@ -1,0 +1,23 @@
+# @package _global_
+use_deepspeed: true
+use_fsdp: false
+use_parallelism_config: false
+use_megatron_lm: false
+use_xpu: false
+
+# DeepSpeed parameters (placeholders; null means use library defaults)
+deepspeed_config_file: null # Provide a JSON to override below auto flags
+zero_stage: 2 # ZeRO Stage 2: good memory savings + low complexity
+offload_optimizer_device: null # 'cpu' only if still OOM after Stage 2
+offload_param_device: null # 'cpu' only if still OOM (adds latency)
+offload_optimizer_nvme_path: null # NVMe path for extreme memory pressure
+offload_param_nvme_path: null
+gradient_accumulation_steps: 1 # Raise (e.g. 4/8) for larger effective batch
+gradient_clipping: 1.0 # Stabilize large model training
+zero3_init_flag: null # Set 'true' when moving to ZeRO-3
+zero3_save_16bit_model: null # Set 'true' to force a consolidated 16-bit checkpoint
+deepspeed_hostfile: null # Populate for explicit multi-node host listing
+deepspeed_exclusion_filter: null
+deepspeed_inclusion_filter: null
+deepspeed_multinode_launcher: null # 'standard'|'pdsh' if using DeepSpeed launcher
+deepspeed_moe_layer_cls_names: null # Comma list of MoE layer class names when using MoE

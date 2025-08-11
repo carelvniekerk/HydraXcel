@@ -1,0 +1,6 @@
+# @package _global_
+use_deepspeed: false
+use_fsdp: false
+use_parallelism_config: false
+use_megatron_lm: false
+use_xpu: false
