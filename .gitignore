@@ -8,3 +8,6 @@ uv.lock
 
 # Apple Finder files
 .DS_Store
+
+# Hydra results dirs
+outputs
