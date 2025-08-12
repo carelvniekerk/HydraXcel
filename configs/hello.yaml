@@ -1,4 +1,4 @@
-default:
+defaults:
 - _self_
 
 constant: 1.0
