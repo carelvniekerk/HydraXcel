@@ -11,3 +11,6 @@ uv.lock
 
 # Hydra results dirs
 outputs
+
+# Weights and Biases logs
+wandb
