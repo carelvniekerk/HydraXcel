@@ -8,7 +8,7 @@ requires-python = ">=3.13"
 dependencies = ["hydra-core>=1.3.2", "pydantic>=2.11.7", "trl>=0.21.0"]
 
 [project.scripts]
-agenticrl = "agenticrl:accelerate.hello"
+agenticrl = "agenticrl.accelerate:hello"
 
 [build-system]
 requires = ["uv_build>=0.8.8,<0.9.0"]

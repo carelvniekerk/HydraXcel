@@ -1,4 +1,5 @@
 defaults:
+- launch_config
 - accelerate/hardware: gpu
 - accelerate/compile: none
 - accelerate/paradigm: torch_ddp
