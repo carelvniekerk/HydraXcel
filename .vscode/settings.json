@@ -1,6 +1,19 @@
 {
     "cSpell.words": [
         "Agentic",
-        "agenticrl"
+        "agenticrl",
+        "AMAX",
+        "autocast",
+        "autotune",
+        "cudagraphs",
+        "fullgraph",
+        "hostfile",
+        "mpirun",
+        "msamp",
+        "multinode",
+        "nvfuser",
+        "nvme",
+        "rdzv",
+        "reshard"
     ]
 }
