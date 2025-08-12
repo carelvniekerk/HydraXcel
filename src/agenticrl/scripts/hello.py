@@ -23,35 +23,22 @@
 # limitations under the License.
 """Test run script for developing the Accelerate Launcher."""
 
-import os
 from pathlib import Path
 
 import torch
 from accelerate import Accelerator
-from hydra import main
 from omegaconf import DictConfig
 
 from agenticrl.scripts.setup_tools import (
-    CONFIGS_PATH,
-    init_wandb,
-    log_accelerator_info,
-    log_system_info,
-    setup_hydra_config_and_logging,
+    accelerate_main,
+    get_logger,
 )
 
-JOB_NAME, logger = setup_hydra_config_and_logging(
-    file_path=Path(__file__),
-    config_keys=["constant"],
-)
+logger = get_logger(Path(__file__).stem)
 
 
-@main(version_base="1.3", config_path=str(CONFIGS_PATH), config_name=JOB_NAME)
-def main(cfg: DictConfig) -> None:  # noqa: D103
-    log_system_info()
-    accelerator: Accelerator = Accelerator()
-    log_accelerator_info(accelerator)
-    if os.getenv("ACCELERATE_DEBUG_MODE", "0") == "1":
-        init_wandb(JOB_NAME, "ConfidentLLM", cfg)
+@accelerate_main("ConfidentLLM")
+def main(cfg: DictConfig, accelerator: Accelerator) -> None:  # noqa: D103
     x: torch.Tensor = torch.ones((5,)) * cfg.constant
     x = x.to(accelerator.device)
     logger.info(x)

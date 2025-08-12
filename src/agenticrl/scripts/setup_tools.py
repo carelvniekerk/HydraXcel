@@ -29,13 +29,16 @@ import platform
 import random
 import socket
 import sys
+from functools import wraps
 from pathlib import Path
+from typing import Callable
 
 import numpy as np
 import torch
 import transformers
 from accelerate import Accelerator
 from git import Repo
+from hydra import main
 from hydra.conf import HydraConf, JobConf, RunDir, SweepDir
 from hydra.core.config_store import ConfigStore
 from omegaconf import DictConfig, OmegaConf
@@ -102,7 +105,7 @@ def setup_hydra_config_and_logging(
     config_keys: list[str],
     change_to_output_dir: bool = True,
     add_hpc_launcher: bool = False,
-) -> tuple[str, logging.Logger]:
+) -> str:
     """Set up Hydra configuration and logging."""
     job_name: str = file_path.stem
     setup_exception_logging(logger)
@@ -155,8 +158,7 @@ def setup_hydra_config_and_logging(
         group="hydra",
     )
 
-    local_logger: logging.Logger = get_logger(job_name)
-    return job_name, local_logger
+    return job_name
 
 
 def init_wandb(task_name: str, project_name: str, config: DictConfig) -> None:
@@ -323,3 +325,32 @@ def log_accelerator_info(accelerator: Accelerator) -> None:
     if torch.mps.is_available():
         logging.info("MPS")
         logging.info(f"\tDevice Count:\t{torch.mps.device_count()}")  # noqa: G004
+
+
+def accelerate_main(project_name: str, *, hydra_base_version: str = "1.3"):
+    """Wrap a main function to run with the Accelerator and configure it using Hydra."""
+
+    def outer(main_func: Callable[..., None]) -> Callable[..., None]:
+        """Run the main function with the Accelerator."""
+        job_name = setup_hydra_config_and_logging(
+            file_path=Path(main_func.__code__.co_filename),  # type: ignore[attr-defined]
+            config_keys=["constant"],
+        )
+
+        @wraps(main_func)
+        @main(
+            version_base=hydra_base_version,
+            config_path=str(CONFIGS_PATH),
+            config_name=job_name,
+        )
+        def acc_main_func(cfg: DictConfig) -> None:
+            log_system_info()
+            accelerator: Accelerator = Accelerator()
+            log_accelerator_info(accelerator)
+            if os.getenv("ACCELERATE_DEBUG_MODE", "0") == "1":
+                init_wandb(job_name, project_name, cfg)
+            main_func(cfg, accelerator)
+
+        return acc_main_func
+
+    return outer
