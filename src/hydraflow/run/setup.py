@@ -347,7 +347,7 @@ def hydraflow_main(
             _log_system_info()
             accelerator: Accelerator = Accelerator()
             _log_accelerator_info(accelerator)
-            if os.getenv("ACCELERATE_DEBUG_MODE", "0") == "1":
+            if not os.getenv("ACCELERATE_DEBUG_MODE", None):
                 _init_wandb(job_name, project_name, cfg)
             main_func(cfg, accelerator)
 
