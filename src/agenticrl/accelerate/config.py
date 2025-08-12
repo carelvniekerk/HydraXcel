@@ -23,30 +23,21 @@
 # limitations under the License.
 """Configuration types for AgenticRL."""
 
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import ClassVar
-
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    Field,
-    field_validator,
-    model_validator,
-)
 
 __all__ = ["CONFIGS_PATH", "LaunchConfig"]
 CONFIGS_PATH: Path = Path(__file__).parent.parent.parent.parent / "configs"
 
 
-class LaunchConfig(BaseModel):
+@dataclass(init=True, frozen=False)
+class LaunchConfig:
     """Launch configuration for Accelerate.
 
     NOTE: This model is frozen (immutable). To adjust values create a new
     instance. Only documented fields are allowed (extra is forbidden).
     """
-
-    # Pydantic configuration
-    model_config = ConfigDict(frozen=False, extra="allow")
 
     # ---------------------- Allowed value sets (class-level) ------------------
     _MIXED_PRECISION_CHOICES: ClassVar[set[str]] = {"no", "fp16", "bf16", "fp8"}
@@ -87,7 +78,7 @@ class LaunchConfig(BaseModel):
 
     # Core / meta
     training_script: str
-    training_script_args: list[str] = Field(default_factory=list)
+    training_script_args: list[str] = field(default_factory=list)
     config_file: str | None = None
     quiet: bool = False
 
@@ -133,8 +124,8 @@ class LaunchConfig(BaseModel):
     # TPU
     tpu_use_cluster: bool = False
     tpu_use_sudo: bool = False
-    vm: list[str] | None = Field(default_factory=list)
-    env: list[str] | None = Field(default_factory=list)
+    vm: list[str] | None = field(default_factory=list)
+    env: list[str] | None = field(default_factory=list)
     main_training_function: str | None = None
     downcast_bf16: bool = False
 
@@ -214,127 +205,134 @@ class LaunchConfig(BaseModel):
     debug: bool = False
 
     # Internal / computed-only: filled later by accelerate when needed
-    # Internal-only (populated later, not user initializable / serialised)
-    deepspeed_fields_from_accelerate_config: str | None = Field(
+    # Internal-only (populated later, not user initialized / serialized)
+    deepspeed_fields_from_accelerate_config: str | None = field(
         default=None,
-        no_init=True,
+        init=False,
     )
+    use_cpu: bool = field(default=False, init=False)
+    use_xpu: bool = field(default=False, init=False)
 
-    # ------------------------------ Validators -------------------------------
-    @field_validator("mixed_precision")
-    @classmethod
-    def _validate_mixed_precision(cls, v: str) -> str:
-        if v not in cls._MIXED_PRECISION_CHOICES:
-            msg = f"mixed_precision must be one of {cls._MIXED_PRECISION_CHOICES}, got {v!r}"  # noqa: E501
+    def __post_init__(self) -> None:
+        """Validate the configuration after initialization."""
+        # Validate fields
+        self._validate_mixed_precision()
+        self._validate_dynamo_backend()
+        self._validate_dynamo_mode()
+        self._validate_fsdp_version()
+        self._validate_fsdp_sharding_strategy()
+        self._validate_zero_stage()
+        self._validate_positive_parallel_degrees(self.megatron_lm_tp_degree)
+        self._validate_positive_parallel_degrees(self.megatron_lm_pp_degree)
+        self._validate_fp8_backend()
+        self._validate_fp8_format()
+        self._validate_fp8_amax_algo()
+        self._validate_fp8_margin()
+        self._validate_fp8_interval()
+        self._validate_fp8_history_len()
+        self._validate_fp8_override_tuple()
+
+        # Validate cross-field dependencies
+        self._validate_paradigm_exclusivity()
+        self._validate_deepspeed_block()
+        self._validate_megatron_block()
+        self._validate_fp8_block()
+
+    def _validate_mixed_precision(self) -> None:
+        if self.mixed_precision not in self._MIXED_PRECISION_CHOICES:
+            msg = (
+                f"mixed_precision must be one of {self._MIXED_PRECISION_CHOICES}, "
+                f"got {self.mixed_precision!r}"
+            )
             raise ValueError(msg)
-        return v
 
-    @field_validator("dynamo_backend")
-    @classmethod
-    def _validate_dynamo_backend(cls, v: str) -> str:
-        if v not in cls._DYNAMO_BACKEND_CHOICES:
-            msg = f"dynamo_backend must be in {cls._DYNAMO_BACKEND_CHOICES}, got {v!r}"
+    def _validate_dynamo_backend(self) -> None:
+        if self.dynamo_backend not in self._DYNAMO_BACKEND_CHOICES:
+            msg = (
+                f"dynamo_backend must be in {self._DYNAMO_BACKEND_CHOICES}, "
+                f"got {self.dynamo_backend!r}"
+            )
             raise ValueError(msg)
-        return v
 
-    @field_validator("dynamo_mode")
-    @classmethod
-    def _validate_dynamo_mode(cls, v: str) -> str:
-        if v not in cls._DYNAMO_MODE_CHOICES:
-            msg = f"dynamo_mode must be in {cls._DYNAMO_MODE_CHOICES}, got {v!r}"
+    def _validate_dynamo_mode(self) -> None:
+        if self.dynamo_mode not in self._DYNAMO_MODE_CHOICES:
+            msg = (
+                f"dynamo_mode must be in {self._DYNAMO_MODE_CHOICES}, "
+                f"got {self.dynamo_mode!r}"
+            )
             raise ValueError(msg)
-        return v
 
-    @field_validator("fsdp_version")
-    @classmethod
-    def _validate_fsdp_version(cls, v: str) -> str:
-        if v not in {"1", "2"}:
+    def _validate_fsdp_version(self) -> None:
+        if self.fsdp_version not in {"1", "2"}:
             msg = "fsdp_version must be '1' or '2'"
             raise ValueError(msg)
-        return v
 
-    @field_validator("fsdp_sharding_strategy")
-    @classmethod
-    def _validate_fsdp_sharding_strategy(cls, v: str) -> str:
-        if v not in cls._FSDP_SHARDING_STRATEGY_CHOICES:
-            msg = f"fsdp_sharding_strategy must be in {cls._FSDP_SHARDING_STRATEGY_CHOICES}, got {v!r}"  # noqa: E501
+    def _validate_fsdp_sharding_strategy(self) -> None:
+        if self.fsdp_sharding_strategy not in self._FSDP_SHARDING_STRATEGY_CHOICES:
+            msg = (
+                f"fsdp_sharding_strategy must be in "
+                f"{self._FSDP_SHARDING_STRATEGY_CHOICES}, "
+                f"got {self.fsdp_sharding_strategy!r}"
+            )
             raise ValueError(msg)
-        return v
 
-    @field_validator("zero_stage")
-    @classmethod
-    def _validate_zero_stage(cls, v: int | None) -> int | None:
-        if v is not None and v not in {1, 2, 3}:
+    def _validate_zero_stage(self) -> None:
+        if self.zero_stage not in {1, 2, 3}:
             msg = "zero_stage must be 1, 2 or 3 when set"
             raise ValueError(msg)
-        return v
 
-    @field_validator("megatron_lm_tp_degree", "megatron_lm_pp_degree")
-    @classmethod
-    def _validate_positive_int(cls, v: int) -> int:
-        if v < 1:
+    @staticmethod
+    def _validate_positive_parallel_degrees(value: int) -> None:
+        if value < 1:
             msg = "Megatron parallel degrees must be >= 1"
             raise ValueError(msg)
-        return v
 
-    @field_validator("fp8_backend")
-    @classmethod
-    def _validate_fp8_backend(cls, v: str | None) -> str | None:
-        if v is not None and v not in cls._FP8_BACKEND_CHOICES:
-            msg = f"fp8_backend must be one of {cls._FP8_BACKEND_CHOICES}, got {v!r}"
+    def _validate_fp8_backend(self) -> None:
+        if (
+            self.fp8_backend is not None
+            and self.fp8_backend not in self._FP8_BACKEND_CHOICES
+        ):
+            msg = (
+                f"fp8_backend must be one of {self._FP8_BACKEND_CHOICES}, "
+                f"got {self.fp8_backend!r}"
+            )
             raise ValueError(msg)
-        return v
 
-    @field_validator("fp8_format")
-    @classmethod
-    def _validate_fp8_format(cls, v: str) -> str:
-        if v not in cls._FP8_FORMAT_CHOICES:
-            msg = f"fp8_format must be in {cls._FP8_FORMAT_CHOICES}, got {v!r}"
+    def _validate_fp8_format(self) -> None:
+        if self.fp8_format not in self._FP8_FORMAT_CHOICES:
+            msg = (
+                f"fp8_format must be in {self._FP8_FORMAT_CHOICES}, "
+                f"got {self.fp8_format!r}"
+            )
             raise ValueError(msg)
-        return v
 
-    @field_validator("fp8_amax_compute_algo")
-    @classmethod
-    def _validate_fp8_amax_algo(cls, v: str) -> str:
-        if v not in cls._FP8_AMAX_ALGO_CHOICES:
-            msg = f"fp8_amax_compute_algo must be in {cls._FP8_AMAX_ALGO_CHOICES}, got {v!r}"  # noqa: E501
+    def _validate_fp8_amax_algo(self) -> None:
+        if self.fp8_amax_compute_algo not in self._FP8_AMAX_ALGO_CHOICES:
+            msg = (
+                f"fp8_amax_compute_algo must be in {self._FP8_AMAX_ALGO_CHOICES}, "
+                f"got {self.fp8_amax_compute_algo!r}"
+            )
             raise ValueError(msg)
-        return v
 
-    @field_validator("fp8_margin")
-    @classmethod
-    def _validate_fp8_margin(cls, v: int) -> int:
-        if v < 0:
+    def _validate_fp8_margin(self) -> None:
+        if self.fp8_margin < 0:
             msg = "fp8_margin must be >= 0"
             raise ValueError(msg)
-        return v
 
-    @field_validator("fp8_interval")
-    @classmethod
-    def _validate_fp8_interval(cls, v: int) -> int:
-        if v < 1:
+    def _validate_fp8_interval(self) -> None:
+        if self.fp8_interval < 1:
             msg = "fp8_interval must be >= 1"
             raise ValueError(msg)
-        return v
 
-    @field_validator("fp8_amax_history_len")
-    @classmethod
-    def _validate_fp8_history_len(cls, v: int) -> int:
-        if v < 1:
+    def _validate_fp8_history_len(self) -> None:
+        if self.fp8_amax_history_len < 1:
             msg = "fp8_amax_history_len must be >= 1"
             raise ValueError(msg)
-        return v
 
-    @field_validator("fp8_override_linear_precision")
-    @classmethod
-    def _validate_fp8_override_tuple(
-        cls,
-        v: tuple[bool, bool, bool],
-    ) -> tuple[bool, bool, bool]:
-        if len(v) != 3:  # noqa: PLR2004 # Single check that tuple has 3 elements
+    def _validate_fp8_override_tuple(self) -> None:
+        if len(self.fp8_override_linear_precision) != 3:  # noqa: PLR2004 # Single check that tuple has 3 elements
             msg = "fp8_override_linear_precision must be a 3-tuple of bools"
             raise ValueError(msg)
-        return v
 
     # ---- helper segmented validators to reduce complexity ----
     def _validate_paradigm_exclusivity(self) -> None:
@@ -373,11 +371,3 @@ class LaunchConfig(BaseModel):
         elif self.fp8_backend is not None:
             msg = "fp8_backend should be None unless mixed_precision='fp8'"
             raise ValueError(msg)
-
-    @model_validator(mode="after")
-    def _validate_cross_field(self) -> "LaunchConfig":
-        self._validate_paradigm_exclusivity()
-        self._validate_deepspeed_block()
-        self._validate_megatron_block()
-        self._validate_fp8_block()
-        return self
