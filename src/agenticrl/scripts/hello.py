@@ -32,18 +32,15 @@ from hydra import main
 from omegaconf import DictConfig
 
 from agenticrl.scripts.setup_tools import (
-    get_logger,
+    CONFIGS_PATH,
     init_wandb,
     log_accelerator_info,
     log_system_info,
     setup_hydra_config_and_logging,
 )
 
-JOB_NAME = Path(__file__).stem
-logger = get_logger(JOB_NAME)
-CONFIGS_PATH: Path = Path(__file__).parent.parent.parent.parent / "configs"
-setup_hydra_config_and_logging(
-    job_name=JOB_NAME,
+JOB_NAME, logger = setup_hydra_config_and_logging(
+    file_path=Path(__file__),
     config_keys=["constant"],
 )
 
@@ -53,7 +50,7 @@ def main(cfg: DictConfig) -> None:  # noqa: D103
     log_system_info()
     accelerator: Accelerator = Accelerator()
     log_accelerator_info(accelerator)
-    if os.environ.get("ACCELERATE_DEBUG_MODE", "0") == "1":
+    if os.getenv("ACCELERATE_DEBUG_MODE", "0") == "1":
         init_wandb(JOB_NAME, "ConfidentLLM", cfg)
     x: torch.Tensor = torch.ones((5,)) * cfg.constant
     x = x.to(accelerator.device)
