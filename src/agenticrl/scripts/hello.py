@@ -30,15 +30,27 @@ from accelerate import Accelerator
 from hydra import main
 from omegaconf import DictConfig
 
+from agenticrl.scripts.setup_tools import (
+    get_logger,
+    log_system_info,
+    setup_hydra_config_and_logging,
+)
+
+logger = get_logger()
 CONFIGS_PATH: Path = Path(__file__).parent.parent.parent.parent / "configs"
+setup_hydra_config_and_logging(
+    job_name="hello",
+    config_keys=["constant"],
+)
 
 
 @main(version_base="1.3", config_path=str(CONFIGS_PATH), config_name="hello")
 def main(cfg: DictConfig) -> None:  # noqa: D103
+    log_system_info()
     accelerator: Accelerator = Accelerator()
     x: torch.Tensor = torch.ones((5,)) * cfg.constant
     x = x.to(accelerator.device)
-    print(x)
+    logger.info(x)
 
 
 if __name__ == "__main__":
