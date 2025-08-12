@@ -1,6 +1,6 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: ConfidentLLM
+# Project: HydraFlow
 # Author: Carel van Niekerk, Benjamin Ruppik
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group

@@ -1,6 +1,6 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: AgenticRL
+# Project: HydraFlow
 # Author: Carel van Niekerk
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
@@ -21,14 +21,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Configuration types for AgenticRL."""
+"""Configuration for Accelerate Launcher using Hydra."""
 
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import ClassVar
 
-__all__ = ["CONFIGS_PATH", "LaunchConfig"]
-CONFIGS_PATH: Path = Path(__file__).parent.parent.parent.parent / "configs"
+__all__ = ["LaunchConfig"]
 
 
 @dataclass(init=True, frozen=False)

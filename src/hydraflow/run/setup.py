@@ -1,6 +1,6 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: ConfidentLLM
+# Project: HydraFlow
 # Author: Carel van Niekerk, Benjamin Ruppik
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
@@ -43,23 +43,18 @@ from hydra.conf import HydraConf, JobConf, RunDir, SweepDir
 from hydra.core.config_store import ConfigStore
 from omegaconf import DictConfig, OmegaConf
 
-from agenticrl.logging import (
+from hydraflow.logging import (
     create_logging_config,
     initialize_wandb,
     setup_exception_logging,
 )
 
 __all__ = [
-    "CONFIGS_PATH",
     "get_logger",
-    "init_wandb",
-    "log_accelerator_info",
-    "log_system_info",
+    "hydraflow_main",
     "set_seed",
-    "setup_hydra_config_and_logging",
 ]
 logger = logging.getLogger("__main__")
-CONFIGS_PATH: Path = Path(__file__).parent.parent.parent.parent / "configs"
 
 
 def create_run_dir(
@@ -99,7 +94,7 @@ def create_run_dir(
     return RunDir(str(run_dir))
 
 
-def setup_hydra_config_and_logging(
+def _setup_hydra_config_and_logging(
     *,
     file_path: Path = Path(__file__),
     config_keys: list[str],
@@ -161,7 +156,7 @@ def setup_hydra_config_and_logging(
     return job_name
 
 
-def init_wandb(task_name: str, project_name: str, config: DictConfig) -> None:
+def _init_wandb(task_name: str, project_name: str, config: DictConfig) -> None:
     """Initialize Weights and Biases.
 
     Args:
@@ -205,7 +200,7 @@ def get_logger(name: str = "__main__") -> logging.Logger:
     return logger
 
 
-def log_system_info() -> None:
+def _log_system_info() -> None:
     """Log system hostname and environment information."""
     try:
         hostname = socket.gethostname()
@@ -293,7 +288,7 @@ def _log_python_env_info() -> None:
         logging.exception("Error logging environment info.")
 
 
-def log_accelerator_info(accelerator: Accelerator) -> None:
+def _log_accelerator_info(accelerator: Accelerator) -> None:
     """Log information about the Accelerator."""
     logging.info("Accelerator Information:")
     logging.info(f"\tDevice:\t\t\t{accelerator.device}")  # noqa: G004
@@ -327,16 +322,17 @@ def log_accelerator_info(accelerator: Accelerator) -> None:
         logging.info(f"\tDevice Count:\t{torch.mps.device_count()}")  # noqa: G004
 
 
-def accelerate_main(
+def hydraflow_main(
     project_name: str,
     *,
+    hydra_configs_dir: str,
     hydra_base_version: str = "1.3",
 ) -> Callable[Callable[..., None], Callable[..., None]]:
     """Wrap a main function to run with the Accelerator and configure it using Hydra."""
 
     def outer(main_func: Callable[..., None]) -> Callable[..., None]:
         """Run the main function with the Accelerator."""
-        job_name = setup_hydra_config_and_logging(
+        job_name = _setup_hydra_config_and_logging(
             file_path=Path(main_func.__code__.co_filename),  # type: ignore[attr-defined]
             config_keys=["constant"],
         )
@@ -344,15 +340,15 @@ def accelerate_main(
         @wraps(main_func)
         @main(
             version_base=hydra_base_version,
-            config_path=str(CONFIGS_PATH),
+            config_path=hydra_configs_dir,
             config_name=job_name,
         )
         def acc_main_func(cfg: DictConfig) -> None:
-            log_system_info()
+            _log_system_info()
             accelerator: Accelerator = Accelerator()
-            log_accelerator_info(accelerator)
+            _log_accelerator_info(accelerator)
             if os.getenv("ACCELERATE_DEBUG_MODE", "0") == "1":
-                init_wandb(job_name, project_name, cfg)
+                _init_wandb(job_name, project_name, cfg)
             main_func(cfg, accelerator)
 
         return acc_main_func

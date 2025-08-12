@@ -1,6 +1,6 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: AgenticRL
+# Project: HydraFlow
 # Author: Carel van Niekerk
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
@@ -21,7 +21,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Test run script for developing the Accelerate Launcher."""
+"""Example script showcasing the use of HydraFlow."""
 
 from pathlib import Path
 
@@ -29,15 +29,14 @@ import torch
 from accelerate import Accelerator
 from omegaconf import DictConfig
 
-from agenticrl.scripts.setup_tools import (
-    accelerate_main,
-    get_logger,
-)
+from hydraflow import get_logger, hydraflow_main
 
+__all__ = ["main"]
 logger = get_logger(Path(__file__).stem)
+CONFIGS_DIR = Path(__file__).parent.parent.parent.parent / "configs"
 
 
-@accelerate_main("ConfidentLLM")
+@hydraflow_main("ConfidentLLM", hydra_configs_dir=str(CONFIGS_DIR))
 def main(cfg: DictConfig, accelerator: Accelerator) -> None:  # noqa: D103
     x: torch.Tensor = torch.ones((5,)) * cfg.constant
     x = x.to(accelerator.device)

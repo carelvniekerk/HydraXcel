@@ -1,6 +1,6 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: AgenticRL
+# Project: HydraFlow
 # Author: Carel van Niekerk
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
@@ -21,7 +21,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Custom launcher for using accelerate."""
+"""Custom launcher for using accelerate in uv script commands."""
 
 import sys
 from pathlib import Path
@@ -30,16 +30,15 @@ from typing import Callable
 from accelerate.commands.launch import launch_command
 from hydra import main
 from hydra.core.config_store import ConfigStore
-from omegaconf import DictConfig
 
-from agenticrl.accelerate.config import CONFIGS_PATH, LaunchConfig
+from hydraflow.accelerate.config import LaunchConfig
 
 __all__ = ["launch"]
 _config_store = ConfigStore.instance()
 _config_store.store(name="launch_config", node=LaunchConfig)
 
 
-def extract_pass_through_args() -> list[str]:
+def _extract_pass_through_args() -> list[str]:
     """Extract passthrough arguments from sys.argv."""
     if "--" in sys.argv:
         idx = sys.argv.index("--")
@@ -53,14 +52,20 @@ def extract_pass_through_args() -> list[str]:
     return []
 
 
-def launch(script_path: Path) -> Callable[[DictConfig], None]:
-    """Launch a script with the given name."""
-    passthrough_args = extract_pass_through_args()
+def launch(
+    script_path: Path,
+    *,
+    hydra_configs_dir: str,
+    config_name: str = "accelerate",
+    hydra_base_version: str = "1.3",
+) -> Callable[[LaunchConfig], None]:
+    """Launch a script at a given path."""
+    passthrough_args = _extract_pass_through_args()
 
     @main(
-        config_path=str(CONFIGS_PATH),
-        config_name="accelerate",
-        version_base="1.3",
+        config_path=hydra_configs_dir,
+        config_name=config_name,
+        version_base=hydra_base_version,
     )
     def launch_fn(cfg: LaunchConfig) -> None:
         """Run the main entry point for the script."""

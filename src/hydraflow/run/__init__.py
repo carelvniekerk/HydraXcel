@@ -1,6 +1,6 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: AgenticRL
+# Project: HydraFlow
 # Author: Carel van Niekerk
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
@@ -21,13 +21,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Include all launch function for uv to run."""
+"""HydraFlow script running tools."""
 
-from pathlib import Path
+from hydraflow.run.setup import (
+    get_logger,
+    hydraflow_main,
+    set_seed,
+)
 
-from agenticrl.accelerate import launch
-
-__all__ = ["hello"]
-SCRIPTS_PATH: Path = Path(__file__).parent
-
-hello = launch(SCRIPTS_PATH / "hello.py")
+__all__ = [
+    "get_logger",
+    "hydraflow_main",
+    "set_seed",
+]

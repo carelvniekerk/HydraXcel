@@ -1,6 +1,6 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: AgenticRL
+# Project: HydraFlow
 # Author: Carel van Niekerk
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
@@ -21,4 +21,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AgenticRL: A Reinforcement Learning Framework for Agentic LLMs."""
+"""HydraFlow: Configuration-driven deep learning launcher."""
+
+from hydraflow.accelerate import launch
+from hydraflow.run import (
+    get_logger,
+    hydraflow_main,
+    set_seed,
+)
+
+__all__ = [
+    "get_logger",
+    "hydraflow_main",
+    "launch",
+    "set_seed",
+]
