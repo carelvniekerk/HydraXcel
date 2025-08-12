@@ -34,6 +34,7 @@ from pathlib import Path
 import numpy as np
 import torch
 import transformers
+from accelerate import Accelerator
 from git import Repo
 from hydra.conf import HydraConf, JobConf, RunDir, SweepDir
 from hydra.core.config_store import ConfigStore
@@ -48,6 +49,7 @@ from agenticrl.logging import (
 __all__ = [
     "get_logger",
     "init_wandb",
+    "log_accelerator_info",
     "log_system_info",
     "set_seed",
     "setup_hydra_config_and_logging",
@@ -151,12 +153,14 @@ def setup_hydra_config_and_logging(
     )
 
 
-def init_wandb(task_name: str) -> None:
+def init_wandb(task_name: str, project_name: str, config: DictConfig) -> None:
     """Initialize Weights and Biases.
 
     Args:
     ----
         task_name(str): The name of the task.
+        project_name (str): The name of the project.
+        config (DictConfig): The Hydra configuration.
 
     """
     hydra_config_path: Path = Path(".hydra") / "hydra.yaml"
@@ -169,9 +173,7 @@ def init_wandb(task_name: str) -> None:
     ):
         return
 
-    config_path: Path = Path(".hydra") / "config.yaml"
-    config: DictConfig = OmegaConf.load(config_path)  # type: ignore  # noqa: PGH003
-    project_name: str = f"ConfidentLLM-{task_name}"
+    project_name: str = f"{project_name}-{task_name}"
     initialize_wandb(config=config, project_name=project_name)
 
 
@@ -183,9 +185,9 @@ def set_seed(seed: int) -> None:
     np.random.default_rng(seed)
 
 
-def get_logger() -> logging.Logger:
+def get_logger(name: str = "__main__") -> logging.Logger:
     """Get the logger."""
-    logger: logging.Logger = logging.getLogger("__main__")
+    logger: logging.Logger = logging.getLogger(name)
 
     # Get the transformer logger and propagate its logs to the Hydra root.
     transformers_logger: logging.Logger = transformers.utils.logging.get_logger()  # type: ignore[unresolved-attribute] # TODO: Remove when ty bug is fixed
@@ -281,3 +283,37 @@ def _log_python_env_info() -> None:
 
     except Exception:
         logging.exception("Error logging environment info.")
+
+
+def log_accelerator_info(accelerator: Accelerator) -> None:
+    """Log information about the Accelerator."""
+    logging.info("Accelerator Information:")
+    logging.info(f"\tDevice:\t\t\t{accelerator.device}")  # noqa: G004
+    logging.info(f"\tDistributed Type:\t{accelerator.distributed_type}")  # noqa: G004
+    logging.info(f"\tNum Processes:\t\t{accelerator.num_processes}")  # noqa: G004
+    logging.info(f"\tLocal Process Index:\t{accelerator.local_process_index}")  # noqa: G004
+    logging.info(f"\tMain Process:\t\t{accelerator.is_main_process}")  # noqa: G004
+    logging.info(f"\tMixed Precision:\t{accelerator.mixed_precision}")  # noqa: G004
+    if getattr(accelerator.state, "gradient_accumulation_steps", None):
+        logging.info(
+            f"\tGrad Accumulation:\t{accelerator.state.gradient_accumulation_steps}",  # noqa: G004
+        )
+    logging.info(
+        f"\tCUDA_VISIBLE_DEVICES:\t{os.getenv('CUDA_VISIBLE_DEVICES', 'None')}",  # noqa: G004
+    )
+    logging.info(
+        f"\tDEBUG:\t\t\t{os.getenv('ACCELERATE_DEBUG_MODE', 'false')}",  # noqa: G004
+    )
+    logging.info(
+        f"\tACCELERATE_LOG_LEVEL:\t{os.getenv('ACCELERATE_LOG_LEVEL', 'None')}",  # noqa: G004
+    )
+    if torch.cuda.is_available():
+        logging.info("CUDA")
+        logging.info(f"\tDevice Count:\t{torch.cuda.device_count()}")  # noqa: G004
+        logging.info(f"\tCurrent Device:\t{torch.cuda.current_device()}")  # noqa: G004
+        logging.info(
+            f"\tDevice Name:\t{torch.cuda.get_device_name(torch.cuda.current_device())}"  # noqa: COM812, G004
+        )
+    if torch.mps.is_available():
+        logging.info("MPS")
+        logging.info(f"\tDevice Count:\t{torch.mps.device_count()}")  # noqa: G004
