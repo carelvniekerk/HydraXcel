@@ -7,6 +7,7 @@
         "autotune",
         "cudagraphs",
         "fullgraph",
+        "gethostname",
         "hostfile",
         "mpirun",
         "msamp",
@@ -14,6 +15,7 @@
         "nvfuser",
         "nvme",
         "rdzv",
-        "reshard"
+        "reshard",
+        "Ruppik"
     ]
 }
