@@ -327,7 +327,11 @@ def log_accelerator_info(accelerator: Accelerator) -> None:
         logging.info(f"\tDevice Count:\t{torch.mps.device_count()}")  # noqa: G004
 
 
-def accelerate_main(project_name: str, *, hydra_base_version: str = "1.3"):
+def accelerate_main(
+    project_name: str,
+    *,
+    hydra_base_version: str = "1.3",
+) -> Callable[Callable[..., None], Callable[..., None]]:
     """Wrap a main function to run with the Accelerator and configure it using Hydra."""
 
     def outer(main_func: Callable[..., None]) -> Callable[..., None]:

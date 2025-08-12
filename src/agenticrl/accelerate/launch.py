@@ -53,9 +53,8 @@ def extract_pass_through_args() -> list[str]:
     return []
 
 
-def launch(script_name: str) -> Callable[[DictConfig], None]:
+def launch(script_path: Path) -> Callable[[DictConfig], None]:
     """Launch a script with the given name."""
-    script_path: Path = Path(__file__).parent.parent / "scripts" / f"{script_name}.py"
     passthrough_args = extract_pass_through_args()
 
     @main(

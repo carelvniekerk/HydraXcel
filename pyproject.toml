@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-agenticrl = "agenticrl.accelerate:hello"
+agenticrl = "agenticrl.scripts:hello"
 
 [build-system]
 requires = ["uv_build>=0.8.8,<0.9.0"]

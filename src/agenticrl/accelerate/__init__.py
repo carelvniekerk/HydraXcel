@@ -25,6 +25,4 @@
 
 from agenticrl.accelerate.launch import launch
 
-__all__ = ["hello"]
-
-hello = launch("hello")
+__all__ = ["launch"]
