@@ -47,6 +47,7 @@ from agenticrl.logging import (
 )
 
 __all__ = [
+    "CONFIGS_PATH",
     "get_logger",
     "init_wandb",
     "log_accelerator_info",
@@ -55,6 +56,7 @@ __all__ = [
     "setup_hydra_config_and_logging",
 ]
 logger = logging.getLogger("__main__")
+CONFIGS_PATH: Path = Path(__file__).parent.parent.parent.parent / "configs"
 
 
 def create_run_dir(
@@ -95,13 +97,14 @@ def create_run_dir(
 
 
 def setup_hydra_config_and_logging(
-    job_name: str,
     *,
+    file_path: Path = Path(__file__),
     config_keys: list[str],
     change_to_output_dir: bool = True,
     add_hpc_launcher: bool = False,
-) -> None:
+) -> tuple[str, logging.Logger]:
     """Set up Hydra configuration and logging."""
+    job_name: str = file_path.stem
     setup_exception_logging(logger)
 
     job_config: JobConf = JobConf(name=job_name, chdir=change_to_output_dir)
@@ -151,6 +154,9 @@ def setup_hydra_config_and_logging(
         name="config",
         group="hydra",
     )
+
+    local_logger: logging.Logger = get_logger(job_name)
+    return job_name, local_logger
 
 
 def init_wandb(task_name: str, project_name: str, config: DictConfig) -> None:
