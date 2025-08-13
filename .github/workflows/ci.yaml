@@ -1,0 +1,42 @@
+name: UnitTests
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+  workflow_dispatch:
+
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.13' ]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Python and uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    # (Optional) Show dependency graph
+    - name: Resolve & sync environment
+      run: |
+        uv sync --all-extras --dev
+        uv tool install ruff
+
+    - name: Run linters (optional)
+      if: matrix.python-version == '3.13'
+      run: |
+        uv run ruff check .
+        uv run ruff format --check .
+
+    - name: Run tests
+      run: |
+        uv run tests
