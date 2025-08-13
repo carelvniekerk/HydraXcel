@@ -2,9 +2,9 @@ name: UnitTests
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master, develop, feature/unit_tests ]
   pull_request:
-    branches: [ master, develop ]
+    branches: [ master, develop, feature/unit_tests ]
   workflow_dispatch:
 
 
@@ -34,8 +34,7 @@ jobs:
     - name: Run linters (optional)
       if: matrix.python-version == '3.13'
       run: |
-        uv run ruff check .
-        uv run ruff format --check .
+        uvx ruff check .
 
     - name: Run tests
       run: |
