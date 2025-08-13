@@ -1,4 +1,4 @@
-# coding=utf-8
+# coding=utf-8  # noqa: INP001
 # --------------------------------------------------------------------------------
 # Project: HydraFlow
 # Author: Carel van Niekerk
@@ -24,11 +24,13 @@
 """Tests for run setup tools."""
 
 from pathlib import Path
-from typing import Iterable, Sequence
+from typing import Callable, Iterable, Sequence
 
 import pytest
+from accelerate import Accelerator
 from hydra.conf import RunDir, SweepDir
-from hydraflow.run.setup import create_run_dir
+from hydraflow.run.setup import create_run_dir, hydraflow_main
+from omegaconf import DictConfig
 
 
 def ensure(expr: object, message: str) -> None:
@@ -109,4 +111,91 @@ def test_create_run_dir_path_order_is_preserved() -> None:
     ensure(
         list(placeholders) == [f"${{{k}}}" for k in keys],
         f"Order not preserved: {placeholders}",
+    )
+
+
+def test_hydraflow_main_wandb(  # noqa: PLR0913
+    isolated_cwd: Path,  # noqa: ARG001
+    hydra_config_dir: Path,
+    wandb_init: dict[str, str],
+    job_name: str,
+    make_user_main: Callable[
+        [dict[str, str] | None],
+        Callable[[DictConfig, Accelerator], None],
+    ],
+    disable_debug: None,  # noqa: ARG001
+    config_constant: int,
+) -> None:
+    """Test hydraflow_main wrapper with W&B integration."""
+    received: dict[str, str] = {}
+    user_main = make_user_main(record=received)  # type: ignore[missing-argument]
+
+    wrapped = hydraflow_main(
+        project_name="demo",
+        hydra_configs_dir=str(hydra_config_dir),
+    )(user_main)
+
+    wrapped()  # Hydra entrypoint
+
+    ensure("device" in received, "Expected 'device' in received")
+    ensure(
+        wandb_init["project_name"] == f"demo-{job_name}",
+        "Unexpected W&B project name",
+    )
+    ensure(wandb_init["constant"] == config_constant, "Unexpected W&B constant")
+    # Working directory should now be inside outputs/
+    ensure(
+        "outputs" in received["working_dir"],
+        "Working directory is not inside outputs/",
+    )
+
+
+def test_hydraflow_main_debug_skips_wandb(
+    isolated_cwd: Path,  # noqa: ARG001
+    hydra_config_dir: Path,
+    wandb_init: dict[str, str],
+    make_user_main: Callable[
+        [dict[str, str] | None],
+        Callable[[DictConfig, Accelerator], None],
+    ],
+    enable_debug: None,  # noqa: ARG001
+) -> None:
+    """Test hydraflow_main wrapper with W&B integration."""
+    received: dict[str, str] = {}
+    user_main = make_user_main(record=received)  # type: ignore[missing-argument]
+
+    wrapped = hydraflow_main(
+        project_name="demo",
+        hydra_configs_dir=str(hydra_config_dir),
+    )(user_main)
+
+    wrapped()  # Hydra entrypoint
+
+    ensure(wandb_init == {}, "W&B should not have been initialized in debug mode")
+
+
+def test_multiple_invocations_clean_state(  # noqa: PLR0913
+    isolated_cwd: Path,  # noqa: ARG001
+    hydra_config_dir: Path,
+    wandb_init: dict[str, str],
+    job_name: str,
+    make_user_main: Callable[
+        [dict[str, str] | None],
+        Callable[[DictConfig, Accelerator], None],
+    ],
+    disable_debug: None,  # noqa: ARG001
+) -> None:
+    """Test that multiple invocations of the wrapped function do not interfere."""
+    user_main = make_user_main()  # type: ignore[missing-argument]
+
+    wrapped = hydraflow_main(
+        project_name="demo",
+        hydra_configs_dir=str(hydra_config_dir),
+    )(user_main)
+
+    wrapped()
+    wrapped()  # second call should still work
+    ensure(
+        wandb_init["project_name"] == f"demo-{job_name}",
+        "Unexpected W&B project name",
     )
