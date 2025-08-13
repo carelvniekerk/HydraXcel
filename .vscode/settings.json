@@ -1,14 +1,18 @@
 {
     "cSpell.words": [
+        "addopts",
         "Agentic",
         "agenticrl",
         "AMAX",
         "autocast",
         "autotune",
+        "autouse",
         "colorlog",
         "cudagraphs",
+        "delenv",
         "fullgraph",
         "gethostname",
+        "hexsha",
         "hostfile",
         "hydraflow",
         "mpirun",
@@ -19,5 +23,13 @@
         "rdzv",
         "reshard",
         "Ruppik"
-    ]
+    ],
+    "python.testing.pytestArgs": [
+        "--cov",
+        "src/hydraflow",
+        "--verbose",
+        "--cov-report=term-missing"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }

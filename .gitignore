@@ -6,6 +6,10 @@ uv.lock
 # Python cache
 *__pycache__*
 
+# Pytest cache
+.coverage
+.pytest_cache
+
 # Apple Finder files
 .DS_Store
 

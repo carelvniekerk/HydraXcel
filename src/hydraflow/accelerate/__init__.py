@@ -23,6 +23,6 @@
 # limitations under the License.
 """Launch scripts via accelerate."""
 
-from hydraflow.accelerate.launch import launch
+from hydraflow.accelerate.launch_tools import launch
 
 __all__ = ["launch"]
