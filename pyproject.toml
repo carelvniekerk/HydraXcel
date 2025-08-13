@@ -25,4 +25,4 @@ build-backend = "uv_build"
 
 # Configuration for Pytest
 [tool.pytest.ini_options]
-addopts = "--cov src/hydraflow --verbose"
+addopts = "--cov src/hydraflow --verbose --cov-report=term-missing"

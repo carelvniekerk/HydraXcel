@@ -31,9 +31,16 @@ from typing import Callable, Generator
 import pytest
 from accelerate import Accelerator
 from hydra.core.global_hydra import GlobalHydra
+from hydraflow.accelerate.config import LaunchConfig
 from omegaconf import DictConfig
 
 CONSTANT: int = 42
+
+
+@pytest.fixture
+def config_constant() -> int:
+    """Provide the constant value for configuration."""
+    return CONSTANT
 
 
 @pytest.fixture(autouse=True)
@@ -67,12 +74,14 @@ def job_name() -> str:
 
 
 @pytest.fixture
-def hydra_config_dir(tmp_path: Path, job_name: str) -> Path:
+def hydra_config_dir(tmp_path: Path, job_name: str, config_constant: int) -> Path:
     """Create a config directory containing the config file named after job_name."""
     cfg_dir = tmp_path / "configs"
     cfg_dir.mkdir(parents=True, exist_ok=True)
     job_config_file: Path = cfg_dir / f"{job_name}.yaml"
-    job_config_file.write_text(f"defaults:\n  - _self_\n\nconstant: {CONSTANT}\n")
+    job_config_file.write_text(
+        f"defaults:\n  - _self_\n\nconstant: {config_constant}\n"
+    )
     return cfg_dir
 
 
@@ -109,7 +118,9 @@ def enable_debug(monkeypatch: pytest.MonkeyPatch) -> str:
 
 
 @pytest.fixture
-def make_user_main() -> Callable[
+def make_user_main(
+    config_constant: int,
+) -> Callable[
     [dict[str, str] | None],
     Callable[[DictConfig, Accelerator], None],
 ]:
@@ -121,8 +132,8 @@ def make_user_main() -> Callable[
     ) -> Callable[[DictConfig, Accelerator], None]:
         def _user_main(cfg: DictConfig, accelerator: Accelerator) -> None:
             # Core assertion shared by tests
-            if cfg.constant != CONSTANT:
-                raise AssertionError(f"Expected {CONSTANT}, got {cfg.constant}.")  # noqa: EM102, TRY003
+            if cfg.constant != config_constant:
+                raise AssertionError(f"Expected {config_constant}, got {cfg.constant}.")  # noqa: EM102, TRY003
             # Optional recording
             if record is not None:
                 record["device"] = str(accelerator.device)
@@ -135,6 +146,48 @@ def make_user_main() -> Callable[
 
 
 @pytest.fixture
-def config_constant() -> int:
-    """Provide the constant value for configuration."""
-    return CONSTANT
+def accelerate_config_dir(tmp_path: Path) -> Path:
+    """Provide a config directory containing accelerate.yaml."""
+    cfg_dir: Path = tmp_path / "accel_configs"
+    cfg_dir.mkdir(parents=True, exist_ok=True)
+    # Create a minimal accelerate.yaml file
+    accelerate_config_path: Path = cfg_dir / "accelerate.yaml"
+    accelerate_config_path.write_text(
+        "defaults:\n  - launch_config\n  - _self_\n\ntraining_script: ''\n",
+    )
+    return cfg_dir
+
+
+@pytest.fixture
+def patch_launch_command(
+    monkeypatch: pytest.MonkeyPatch,
+) -> Callable[
+    [dict[str, str | list[str]] | None],
+    None,
+]:
+    """Monkeypatch a fake launch command for testing."""
+
+    def _patch(
+        *,
+        record: dict[str, str | list[str]] | None = None,
+    ) -> None:
+        def fake_launch_command(args: LaunchConfig) -> None:
+            if record is not None:
+                record["training_script"] = args.training_script
+                record["training_script_args"] = args.training_script_args
+
+        monkeypatch.setattr(
+            "hydraflow.accelerate.launch_tools.launch_command",
+            fake_launch_command,
+            raising=True,
+        )
+
+    return _patch  # type: ignore[invalid-return-type] # Remove once Todo in Ty is solved
+
+
+@pytest.fixture
+def dummy_script(isolated_cwd: Path) -> Path:
+    """Create a dummy training script."""
+    script_path = isolated_cwd / "train.py"
+    script_path.write_text("print('ok')\n")
+    return script_path

@@ -29,9 +29,13 @@ from hydraflow.accelerate import launch
 
 __all__ = ["hello"]
 SCRIPTS_PATH: Path = Path(__file__).parent
-CONFIGS_PATH: Path = SCRIPTS_PATH.parent.parent.parent / "configs"
+CONFIGS_PATH: Path = SCRIPTS_PATH.parent / "configs"
 
 launch_hello = launch(
     SCRIPTS_PATH / "hello.py",
     hydra_configs_dir=str(CONFIGS_PATH),
 )
+
+# Only for demonstration purposes, should be run as a module using uv as documented.
+if __name__ == "__main__":
+    launch_hello()  # type: ignore[missing-argument]

@@ -12,6 +12,7 @@
         "delenv",
         "fullgraph",
         "gethostname",
+        "hexsha",
         "hostfile",
         "hydraflow",
         "mpirun",
@@ -27,6 +28,7 @@
         "--cov",
         "src/hydraflow",
         "--verbose",
+        "--cov-report=term-missing"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true

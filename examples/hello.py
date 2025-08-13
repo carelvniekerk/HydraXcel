@@ -27,13 +27,12 @@ from pathlib import Path
 
 import torch
 from accelerate import Accelerator
-from omegaconf import DictConfig
-
 from hydraflow import get_logger, hydraflow_main
+from omegaconf import DictConfig
 
 __all__ = ["main"]
 logger = get_logger(Path(__file__).stem)
-CONFIGS_DIR = Path(__file__).parent.parent.parent.parent / "configs"
+CONFIGS_DIR = Path(__file__).parent.parent / "configs"
 
 
 @hydraflow_main("ConfidentLLM", hydra_configs_dir=str(CONFIGS_DIR))
