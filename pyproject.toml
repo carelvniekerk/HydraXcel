@@ -13,9 +13,6 @@ dependencies = [
     "wandb>=0.21.1",
 ]
 
-[project.scripts]
-launch = "hydraflow.examples:launch_hello"
-
 [build-system]
 requires = ["uv_build>=0.8.8,<0.9.0"]
 build-backend = "uv_build"
