@@ -13,6 +13,16 @@ dependencies = [
     "wandb>=0.21.1",
 ]
 
+[dependency-groups]
+dev = ["pytest>=8.4.1", "pytest-cov>=6.2.1"]
+
+[project.scripts]
+tests = "pytest:main"
+
 [build-system]
 requires = ["uv_build>=0.8.8,<0.9.0"]
 build-backend = "uv_build"
+
+# Configuration for Pytest
+[tool.pytest.ini_options]
+addopts = "--cov src/hydraflow --verbose"

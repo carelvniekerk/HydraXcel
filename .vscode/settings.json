@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
+        "addopts",
         "Agentic",
         "agenticrl",
         "AMAX",
@@ -19,5 +20,12 @@
         "rdzv",
         "reshard",
         "Ruppik"
-    ]
+    ],
+    "python.testing.pytestArgs": [
+        "--cov",
+        "src/hydraflow",
+        "--verbose",
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }
