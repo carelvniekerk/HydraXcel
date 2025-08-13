@@ -210,6 +210,8 @@ class LaunchConfig:
     )
     use_cpu: bool = field(default=False, init=False)
     use_xpu: bool = field(default=False, init=False)
+    nproc_per_node: int = field(default=1, init=False)
+    master_port: str = field(default="0000", init=False)
 
     def __post_init__(self) -> None:
         """Validate the configuration after initialization."""
