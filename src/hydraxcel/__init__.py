@@ -1,6 +1,6 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: HydraFlow
+# Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
@@ -21,8 +21,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Launch scripts via accelerate."""
+"""HydraXcel: Configuration-driven deep learning launcher."""
 
-from hydraflow.accelerate.launch_tools import launch
+from hydraxcel.accelerate import launch
+from hydraxcel.run import (
+    get_logger,
+    hydraxcel_main,
+    set_seed,
+)
 
-__all__ = ["launch"]
+__all__ = [
+    "get_logger",
+    "hydraxcel_main",
+    "launch",
+    "set_seed",
+]

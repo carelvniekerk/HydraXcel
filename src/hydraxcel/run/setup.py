@@ -1,6 +1,6 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: HydraFlow
+# Project: HydraXcel
 # Author: Carel van Niekerk, Benjamin Ruppik
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
@@ -43,7 +43,7 @@ from hydra.conf import HydraConf, JobConf, RunDir, SweepDir
 from hydra.core.config_store import ConfigStore
 from omegaconf import DictConfig, OmegaConf
 
-from hydraflow.logging import (
+from hydraxcel.logging import (
     create_logging_config,
     initialize_wandb,
     setup_exception_logging,
@@ -51,7 +51,7 @@ from hydraflow.logging import (
 
 __all__ = [
     "get_logger",
-    "hydraflow_main",
+    "hydraxcel_main",
     "set_seed",
 ]
 logger = logging.getLogger("__main__")
@@ -322,7 +322,7 @@ def _log_accelerator_info(accelerator: Accelerator) -> None:
         logging.info(f"\tDevice Count:\t{torch.mps.device_count()}")  # noqa: G004
 
 
-def hydraflow_main(
+def hydraxcel_main(
     project_name: str,
     *,
     hydra_configs_dir: str,

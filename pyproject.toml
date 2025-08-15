@@ -1,7 +1,7 @@
 [project]
-name = "hydraflow"
+name = "hydraxcel"
 version = "0.1.0a"
-description = "HydraFlow: Configuration-driven deep learning launcher combining Hydra, Accelerate, and UV for fast, reproducible experiments."
+description = "HydraXcel: Configuration-driven deep learning launcher combining Hydra, Accelerate, and UV for fast, reproducible experiments."
 readme = "README.md"
 authors = [{ name = "Carel van Niekerk", email = "vniekerk.carel@gmail.com" }]
 requires-python = ">=3.13"
@@ -25,4 +25,4 @@ build-backend = "uv_build"
 
 # Configuration for Pytest
 [tool.pytest.ini_options]
-addopts = "--cov src/hydraflow --verbose --cov-report=term-missing"
+addopts = "--cov src/hydraxcel --verbose --cov-report=term-missing"

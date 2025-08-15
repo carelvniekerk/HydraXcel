@@ -1,6 +1,6 @@
 # coding=utf-8  # noqa: INP001
 # --------------------------------------------------------------------------------
-# Project: HydraFlow
+# Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
@@ -31,7 +31,7 @@ from typing import Callable, Generator
 import pytest
 from accelerate import Accelerator
 from hydra.core.global_hydra import GlobalHydra
-from hydraflow.accelerate.config import LaunchConfig
+from hydraxcel.accelerate.config import LaunchConfig
 from omegaconf import DictConfig
 
 CONSTANT: int = 42
@@ -94,9 +94,9 @@ def wandb_init(monkeypatch: pytest.MonkeyPatch) -> dict[str, str]:
         calls["project_name"] = project_name
         calls["constant"] = getattr(config, "constant", None)
 
-    # Patch the symbol imported into hydraflow.run.setup
+    # Patch the symbol imported into hydraxcel.run.setup
     monkeypatch.setattr(
-        "hydraflow.run.setup.initialize_wandb",
+        "hydraxcel.run.setup.initialize_wandb",
         fake_initialize_wandb,
         raising=True,
     )
@@ -177,7 +177,7 @@ def patch_launch_command(
                 record["training_script_args"] = args.training_script_args
 
         monkeypatch.setattr(
-            "hydraflow.accelerate.launch_tools.launch_command",
+            "hydraxcel.accelerate.launch_tools.launch_command",
             fake_launch_command,
             raising=True,
         )

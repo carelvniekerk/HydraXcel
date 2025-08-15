@@ -1,6 +1,6 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: HydraFlow
+# Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Callable
 
 import pytest
-from hydraflow import launch
+from hydraxcel import launch
 
 
 def ensure(expr: object, message: str) -> None:

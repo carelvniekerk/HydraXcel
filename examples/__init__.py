@@ -1,6 +1,6 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: HydraFlow
+# Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
@@ -25,7 +25,7 @@
 
 from pathlib import Path
 
-from hydraflow.accelerate import launch
+from hydraxcel.accelerate import launch
 
 __all__ = ["hello"]
 SCRIPTS_PATH: Path = Path(__file__).parent

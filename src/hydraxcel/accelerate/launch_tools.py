@@ -1,6 +1,6 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: HydraFlow
+# Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
@@ -31,7 +31,7 @@ from accelerate.commands.launch import launch_command
 from hydra import main
 from hydra.core.config_store import ConfigStore
 
-from hydraflow.accelerate.config import LaunchConfig
+from hydraxcel.accelerate.config import LaunchConfig
 
 __all__ = ["launch"]
 _config_store = ConfigStore.instance()

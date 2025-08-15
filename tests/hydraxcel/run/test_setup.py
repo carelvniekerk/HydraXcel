@@ -1,6 +1,6 @@
 # coding=utf-8  # noqa: INP001
 # --------------------------------------------------------------------------------
-# Project: HydraFlow
+# Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
@@ -29,7 +29,7 @@ from typing import Callable, Iterable, Sequence
 import pytest
 from accelerate import Accelerator
 from hydra.conf import RunDir, SweepDir
-from hydraflow.run.setup import create_run_dir, hydraflow_main
+from hydraxcel.run.setup import create_run_dir, hydraxcel_main
 from omegaconf import DictConfig
 
 
@@ -114,7 +114,7 @@ def test_create_run_dir_path_order_is_preserved() -> None:
     )
 
 
-def test_hydraflow_main_wandb(  # noqa: PLR0913
+def test_hydraxcel_main_wandb(  # noqa: PLR0913
     isolated_cwd: Path,  # noqa: ARG001
     hydra_config_dir: Path,
     wandb_init: dict[str, str],
@@ -126,11 +126,11 @@ def test_hydraflow_main_wandb(  # noqa: PLR0913
     disable_debug: None,  # noqa: ARG001
     config_constant: int,
 ) -> None:
-    """Test hydraflow_main wrapper with W&B integration."""
+    """Test hydraxcel_main wrapper with W&B integration."""
     received: dict[str, str] = {}
     user_main = make_user_main(record=received)  # type: ignore[missing-argument]
 
-    wrapped = hydraflow_main(
+    wrapped = hydraxcel_main(
         project_name="demo",
         hydra_configs_dir=str(hydra_config_dir),
     )(user_main)
@@ -150,7 +150,7 @@ def test_hydraflow_main_wandb(  # noqa: PLR0913
     )
 
 
-def test_hydraflow_main_debug_skips_wandb(
+def test_hydraxcel_main_debug_skips_wandb(
     isolated_cwd: Path,  # noqa: ARG001
     hydra_config_dir: Path,
     wandb_init: dict[str, str],
@@ -160,11 +160,11 @@ def test_hydraflow_main_debug_skips_wandb(
     ],
     enable_debug: None,  # noqa: ARG001
 ) -> None:
-    """Test hydraflow_main wrapper with W&B integration."""
+    """Test hydraxcel_main wrapper with W&B integration."""
     received: dict[str, str] = {}
     user_main = make_user_main(record=received)  # type: ignore[missing-argument]
 
-    wrapped = hydraflow_main(
+    wrapped = hydraxcel_main(
         project_name="demo",
         hydra_configs_dir=str(hydra_config_dir),
     )(user_main)
@@ -188,7 +188,7 @@ def test_multiple_invocations_clean_state(  # noqa: PLR0913
     """Test that multiple invocations of the wrapped function do not interfere."""
     user_main = make_user_main()  # type: ignore[missing-argument]
 
-    wrapped = hydraflow_main(
+    wrapped = hydraxcel_main(
         project_name="demo",
         hydra_configs_dir=str(hydra_config_dir),
     )(user_main)

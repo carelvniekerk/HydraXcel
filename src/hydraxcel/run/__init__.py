@@ -1,6 +1,6 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: HydraFlow
+# Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
@@ -21,16 +21,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""HydraFlow script running tools."""
+"""HydraXcel script running tools."""
 
-from hydraflow.run.setup import (
+from hydraxcel.run.setup import (
     get_logger,
-    hydraflow_main,
+    hydraxcel_main,
     set_seed,
 )
 
 __all__ = [
     "get_logger",
-    "hydraflow_main",
+    "hydraxcel_main",
     "set_seed",
 ]
