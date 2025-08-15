@@ -24,6 +24,7 @@
 """Custom launcher for using accelerate in uv script commands."""
 
 import sys
+from argparse import Namespace
 from pathlib import Path
 from typing import Callable
 
@@ -72,6 +73,6 @@ def launch(
         cfg.training_script = str(script_path)
         cfg.training_script_args = passthrough_args
 
-        launch_command(cfg)
+        launch_command(Namespace(**cfg))
 
     return launch_fn
