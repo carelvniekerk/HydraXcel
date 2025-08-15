@@ -80,7 +80,7 @@ def hydra_config_dir(tmp_path: Path, job_name: str, config_constant: int) -> Pat
     cfg_dir.mkdir(parents=True, exist_ok=True)
     job_config_file: Path = cfg_dir / f"{job_name}.yaml"
     job_config_file.write_text(
-        f"defaults:\n  - _self_\n\nconstant: {config_constant}\n"
+        f"defaults:\n  - _self_\n\nconstant: {config_constant}\n",
     )
     return cfg_dir
 
