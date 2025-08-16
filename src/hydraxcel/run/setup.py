@@ -166,6 +166,8 @@ def _init_wandb(task_name: str, project_name: str, config: DictConfig) -> None:
         config (DictConfig): The Hydra configuration.
 
     """
+    if not Accelerator().is_main_process:
+        return
     hydra_config_path: Path = Path(".hydra") / "hydra.yaml"
     hydra_config: DictConfig = OmegaConf.load(hydra_config_path)  # type: ignore  # noqa: PGH003
 
