@@ -34,12 +34,12 @@ __all__ = ["initialize_wandb"]
 
 
 def initialize_wandb(
+    *,
     config: DictConfig | None = None,
     project_name: str = "ConfidentLLM",
 ) -> None:
     """Initialize wandb."""
     wandb_path = find_project_root(Path(__file__))
-
     wandb.init(
         project=project_name,
         dir=wandb_path.as_posix(),

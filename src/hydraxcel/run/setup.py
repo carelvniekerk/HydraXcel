@@ -23,41 +23,37 @@
 # limitations under the License.
 """Runner for question answering using the ConfidentLLM package."""
 
-import logging
-import os
-import platform
 import random
-import socket
-import sys
 from functools import wraps
 from pathlib import Path
 from typing import Callable
 
 import numpy as np
 import torch
-import transformers
 from accelerate import Accelerator
-from git import Repo
 from hydra import main
 from hydra.conf import HydraConf, JobConf, RunDir, SweepDir
 from hydra.core.config_store import ConfigStore
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 
 from hydraxcel.logging import (
+    LoggingPlatform,
     create_logging_config,
-    initialize_wandb,
+    get_logger,
+    init_logging_platform,
+    log_accelerator_info,
+    log_system_info,
     setup_exception_logging,
 )
 
 __all__ = [
-    "get_logger",
     "hydraxcel_main",
     "set_seed",
 ]
-logger = logging.getLogger("__main__")
+logger = get_logger("__main__")
 
 
-def create_run_dir(
+def _create_run_dir(
     root_dir: Path,
     config_keys: list[str],
     *,
@@ -108,11 +104,11 @@ def _setup_hydra_config_and_logging(
     job_config: JobConf = JobConf(name=job_name, chdir=change_to_output_dir)
     logging_config: dict = create_logging_config()
 
-    run_dir: RunDir = create_run_dir(  # type: ignore[assignment]
+    run_dir: RunDir = _create_run_dir(  # type: ignore[assignment]
         root_dir=Path("outputs"),
         config_keys=config_keys,
     )
-    sweep_dir: SweepDir = create_run_dir(  # type: ignore[assignment]
+    sweep_dir: SweepDir = _create_run_dir(  # type: ignore[assignment]
         root_dir=Path("multirun") if not add_hpc_launcher else Path("hpc_jobs"),
         config_keys=config_keys,
         is_sweep=True,
@@ -156,32 +152,6 @@ def _setup_hydra_config_and_logging(
     return job_name
 
 
-def _init_wandb(task_name: str, project_name: str, config: DictConfig) -> None:
-    """Initialize Weights and Biases.
-
-    Args:
-    ----
-        task_name(str): The name of the task.
-        project_name (str): The name of the project.
-        config (DictConfig): The Hydra configuration.
-
-    """
-    if not Accelerator().is_main_process:
-        return
-    hydra_config_path: Path = Path(".hydra") / "hydra.yaml"
-    hydra_config: DictConfig = OmegaConf.load(hydra_config_path)  # type: ignore  # noqa: PGH003
-
-    # When submitting HPC jobs, we don't want to initialize wandb
-    if (
-        hydra_config.hydra.mode.lower() == "multirun"
-        and "submission" in hydra_config.hydra.launcher.__target__
-    ):
-        return
-
-    project_name: str = f"{project_name}-{task_name}"
-    initialize_wandb(config=config, project_name=project_name)
-
-
 def set_seed(seed: int) -> None:
     """Set the seed for reproducibility."""
     torch.manual_seed(seed)
@@ -190,147 +160,16 @@ def set_seed(seed: int) -> None:
     np.random.default_rng(seed)
 
 
-def get_logger(name: str = "__main__") -> logging.Logger:
-    """Get the logger."""
-    logger: logging.Logger = logging.getLogger(name)
-
-    # Get the transformer logger and propagate its logs to the Hydra root.
-    transformers_logger: logging.Logger = transformers.utils.logging.get_logger()  # type: ignore[unresolved-attribute] # TODO: Remove when ty bug is fixed
-    transformers_logger.handlers = []
-    transformers_logger.propagate = True
-
-    return logger
-
-
-def _log_system_info() -> None:
-    """Log system hostname and environment information."""
-    try:
-        hostname = socket.gethostname()
-    except Exception:  # noqa: BLE001 - We want to proceed no matter what the error is
-        hostname = "unknown"
-
-    logging.info(
-        msg=f"Running on {hostname = }",  # noqa: G004 - low overhead
-    )
-
-    _log_python_env_info()
-    _log_git_info()
-
-
-def _log_git_info() -> None:
-    """Get the git info of the current branch and commit hash."""
-    try:
-        repo = Repo(
-            path=Path(__file__).resolve().parent,
-            search_parent_directories=True,
-        )
-        branch_name: str = repo.active_branch.name
-        commit_hex: str = repo.head.object.hexsha
-        logging.info("Version Control")
-        logging.info(
-            msg=f"\tBranch Name:\t{branch_name}",  # noqa: G004 - low overhead
-        )
-        logging.info(
-            msg=f"\tCommit Hex:\t{commit_hex}",  # noqa: G004 - low overhead
-        )
-    except Exception:  # noqa: BLE001 - We want to proceed no matter what the error is
-        logging.info(
-            msg="Unable to determine git branch/commit",
-        )
-
-
-def _log_python_env_info() -> None:
-    """Log Python environment and Poetry information."""
-    # Log Python version and executable
-    try:
-        python_version: str = sys.version.split()[0]
-        python_path: str = sys.executable
-        logging.info(
-            msg=f"Python version: {python_version}",  # noqa: G004 - low overhead
-        )
-        logging.info(
-            msg=f"Python executable: {python_path}",  # noqa: G004 - low overhead
-        )
-    except Exception:  # noqa: BLE001 - We want to proceed no matter what the error is
-        logger.info(msg="Unable to determine Python version/path")
-
-    try:
-        # Virtualenv Section
-        python_version = sys.version.split()[0]
-        implementation = platform.python_implementation()
-        executable = Path(sys.executable)
-        venv_path = executable.parent.parent if "VIRTUAL_ENV" in os.environ else None
-        valid_venv = bool(venv_path and (venv_path / "bin" / "python").exists())
-
-        logging.info("Virtualenv")
-        logging.info(f"\tPython:\t\t{python_version}")  # noqa: G004
-        logging.info(f"\tImplementation:\t{implementation}")  # noqa: G004
-        logging.info(
-            f"\tPath:\t\t{venv_path if venv_path else 'Not in a virtual environment'}",  # noqa: G004
-        )
-        logging.info(f"\tExecutable:\t{executable}")  # noqa: G004
-        logging.info(f"\tValid:\t\t{valid_venv}")  # noqa: G004
-
-        # Base Section
-        base_path = Path(sys.base_prefix)
-        platform_name = platform.system().lower()
-        os_type = os.name
-        base_executable = base_path / "bin" / f"python{python_version[:3]}"
-        if not base_executable.exists():
-            base_executable = Path(sys.base_exec_prefix)
-
-        logging.info("Base")
-        logging.info(f"\tPlatform:\t{platform_name}")  # noqa: G004
-        logging.info(f"\tOS:\t\t{os_type}")  # noqa: G004
-        logging.info(f"\tPython:\t\t{python_version}")  # noqa: G004
-        logging.info(f"\tPath:\t\t{base_path}")  # noqa: G004
-        logging.info(f"\tExecutable:\t{base_executable}")  # noqa: G004
-
-    except Exception:
-        logging.exception("Error logging environment info.")
-
-
-def _log_accelerator_info(accelerator: Accelerator) -> None:
-    """Log information about the Accelerator."""
-    logging.info("Accelerator Information:")
-    logging.info(f"\tDevice:\t\t\t{accelerator.device}")  # noqa: G004
-    logging.info(f"\tDistributed Type:\t{accelerator.distributed_type}")  # noqa: G004
-    logging.info(f"\tNum Processes:\t\t{accelerator.num_processes}")  # noqa: G004
-    logging.info(f"\tLocal Process Index:\t{accelerator.local_process_index}")  # noqa: G004
-    logging.info(f"\tMain Process:\t\t{accelerator.is_main_process}")  # noqa: G004
-    logging.info(f"\tMixed Precision:\t{accelerator.mixed_precision}")  # noqa: G004
-    if getattr(accelerator.state, "gradient_accumulation_steps", None):
-        logging.info(
-            f"\tGrad Accumulation:\t{accelerator.state.gradient_accumulation_steps}",  # noqa: G004
-        )
-    logging.info(
-        f"\tCUDA_VISIBLE_DEVICES:\t{os.getenv('CUDA_VISIBLE_DEVICES', 'None')}",  # noqa: G004
-    )
-    logging.info(
-        f"\tDEBUG:\t\t\t{os.getenv('ACCELERATE_DEBUG_MODE', 'false')}",  # noqa: G004
-    )
-    logging.info(
-        f"\tACCELERATE_LOG_LEVEL:\t{os.getenv('ACCELERATE_LOG_LEVEL', 'None')}",  # noqa: G004
-    )
-    if torch.cuda.is_available():
-        logging.info("CUDA")
-        logging.info(f"\tDevice Count:\t{torch.cuda.device_count()}")  # noqa: G004
-        logging.info(f"\tCurrent Device:\t{torch.cuda.current_device()}")  # noqa: G004
-        logging.info(
-            f"\tDevice Name:\t{torch.cuda.get_device_name(torch.cuda.current_device())}"  # noqa: COM812, G004
-        )
-    if torch.mps.is_available():
-        logging.info("MPS")
-        logging.info(f"\tDevice Count:\t{torch.mps.device_count()}")  # noqa: G004
-
-
 def hydraxcel_main(
     project_name: str,
     *,
     hydra_configs_dir: str,
     hydra_base_version: str = "1.3",
+    logging_platform: LoggingPlatform | str = LoggingPlatform.WANDB,
 ) -> Callable[Callable[..., None], Callable[..., None]]:
     """Wrap a main function to run with the Accelerator and configure it using Hydra."""
+    if not isinstance(logging_platform, LoggingPlatform):
+        logging_platform: LoggingPlatform = LoggingPlatform(logging_platform)
 
     def outer(main_func: Callable[..., None]) -> Callable[..., None]:
         """Run the main function with the Accelerator."""
@@ -346,11 +185,15 @@ def hydraxcel_main(
             config_name=job_name,
         )
         def acc_main_func(cfg: DictConfig) -> None:
-            _log_system_info()
+            log_system_info()
             accelerator: Accelerator = Accelerator()
-            _log_accelerator_info(accelerator)
-            if not os.getenv("ACCELERATE_DEBUG_MODE", None):
-                _init_wandb(job_name, project_name, cfg)
+            log_accelerator_info(accelerator)
+            init_logging_platform(
+                platform=logging_platform,  # type: ignore[invalid-argument-type]
+                config=cfg,
+                project_name=project_name,
+                task_name=job_name,
+            )
             main_func(cfg, accelerator)
 
         return acc_main_func
