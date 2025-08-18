@@ -75,7 +75,7 @@ class LaunchConfig:
     )
 
     # Core / meta
-    training_script: str
+    training_script: str = field(default_factory=str)
     training_script_args: list[str] = field(default_factory=list)
     config_file: str | None = None
     quiet: bool = False
