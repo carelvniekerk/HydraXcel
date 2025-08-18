@@ -24,6 +24,7 @@
         "hexsha",
         "hostfile",
         "hydraxcel",
+        "mlflow",
         "mpirun",
         "msamp",
         "multinode",

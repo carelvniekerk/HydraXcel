@@ -18,3 +18,9 @@ outputs
 
 # Weights and Biases logs
 wandb
+
+# MLFlow logs
+mlflow
+
+# Ruff Cache
+.ruff_cache
