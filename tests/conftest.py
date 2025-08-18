@@ -31,8 +31,9 @@ from typing import Callable, Generator
 import pytest
 from accelerate import Accelerator
 from hydra.core.global_hydra import GlobalHydra
-from hydraxcel.accelerate.config import LaunchConfig
 from omegaconf import DictConfig
+
+from hydraxcel.accelerate.config import LaunchConfig
 
 CONSTANT: int = 42
 
@@ -86,10 +87,7 @@ def hydra_config_dir(tmp_path: Path, job_name: str, config_constant: int) -> Pat
 
 
 @pytest.fixture
-def logging_platform_init(
-    monkeypatch: pytest.MonkeyPatch,
-    job_name: str,
-) -> dict[str, str]:
+def logging_platform_init(monkeypatch: pytest.MonkeyPatch) -> dict[str, str]:
     """Mock logging platform initialization call."""
     calls: dict[str, str] = {}
 

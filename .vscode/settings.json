@@ -1,4 +1,15 @@
 {
+    // Configuration for Pytest
+    "python.testing.pytestArgs": [
+        "--cov",
+        "src/hydraxcel",
+        "--verbose",
+        "--cov-report=term-missing"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    //
+    // Configuration for Spell Checking
     "cSpell.words": [
         "addopts",
         "AMAX",
@@ -22,12 +33,4 @@
         "reshard",
         "Ruppik"
     ],
-    "python.testing.pytestArgs": [
-        "--cov",
-        "src/hydraxcel",
-        "--verbose",
-        "--cov-report=term-missing"
-    ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
 }

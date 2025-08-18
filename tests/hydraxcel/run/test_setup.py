@@ -29,8 +29,9 @@ from typing import Callable, Iterable, Sequence
 import pytest
 from accelerate import Accelerator
 from hydra.conf import RunDir, SweepDir
-from hydraxcel.run.setup import _create_run_dir, hydraxcel_main
 from omegaconf import DictConfig
+
+from hydraxcel.run.setup import _create_run_dir, hydraxcel_main
 
 
 def ensure(expr: object, message: str) -> None:

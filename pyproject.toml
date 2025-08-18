@@ -27,3 +27,31 @@ build-backend = "uv_build"
 # Configuration for Pytest
 [tool.pytest.ini_options]
 addopts = "--cov src/hydraxcel --verbose --cov-report=term-missing"
+
+# Configuration for Ruff (Python linter and formatter)
+[tool.ruff]
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "W191",
+    "T201",
+    "UP035",
+    "N816",
+    "W293",
+    "DTZ005",
+    "DTZ007",
+    "S602",
+    "UP009",
+    "ERA001",
+    "RET504",
+    "TC002",
+    "LOG015",
+    "D203",
+    "D213",
+    "FIX002",
+    "TD002",
+    "TD003",
+]
+fixable = ["ALL"]
