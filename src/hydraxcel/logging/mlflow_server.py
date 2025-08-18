@@ -41,7 +41,7 @@ logger = getLogger("mlflow")
 class ServerConfig:
     """MLFlow server configuration."""
 
-    backend_store_uri: Path = Path("mlflow")
+    backend_store_uri: Path = Path("mlflow_logs")
     host: str = "127.0.0.1"
     port: int = 5000
     dev: bool = False
