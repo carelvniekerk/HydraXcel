@@ -23,64 +23,57 @@
 # limitations under the License.
 """Initialise the weights and biases logging."""
 
+import logging
+import os
 from pathlib import Path
 
 import wandb
 from omegaconf import DictConfig, OmegaConf
 
+from hydraxcel.logging.helpers import find_project_root
+
 __all__ = ["initialize_wandb"]
 
 
-def find_project_root(current_path: Path, marker: str = "pyproject.toml") -> Path:
-    """Traverse up the directory structure to find the root directory.
-
-    Args:
-    ----
-        current_path (Path): The current file path.
-        marker (str): A marker file or directory indicating the root.
-
-    Returns:
-    -------
-        Path: The root directory path.
-
-    """
-    # Remove the filename if it ends with .py
-    current_path = current_path.resolve()
-    if current_path.suffix == ".py":
-        current_path = current_path.parent
-
-    if (current_path / marker).exists():
-        return current_path
-
-    while current_path != current_path.parent:
-        # Check if any marker exists in the current directory
-        if (current_path / marker).exists():
-            return current_path
-
-        # Move one directory up
-        current_path = current_path.parent
-
-    # If we reach the filesystem root and haven't found the marker, raise an error
-    msg = f"{marker} not found in any parent directories."
-    raise FileNotFoundError(msg)
-
-
 def initialize_wandb(
+    *,
     config: DictConfig | None = None,
     project_name: str = "ConfidentLLM",
 ) -> None:
     """Initialize wandb."""
-    wandb_path = find_project_root(Path(__file__))
+    os.environ["WANDB_SILENT"] = "true"
 
-    wandb.init(
+    wandb_path = find_project_root(Path(__file__)) / "wandb_logs"
+    wandb_run: wandb.Run = wandb.init(
         project=project_name,
-        dir=str(wandb_path),
+        dir=wandb_path.as_posix(),
         settings=wandb.Settings(
             start_method="thread",  # Note: https://docs.wandb.ai/guides/integrations/hydra#troubleshooting-multiprocessing
             x_service_wait=300,
             init_timeout=300,
         ),
     )
+
+    # Clear wandb's internal logging to avoid duplicate messages
+    wandb_logger = logging.getLogger("wandb")
+    wandb_logger.handlers.clear()
+    wandb_logger.propagate = True
+
+    # Get user info and log it
+    user_info = wandb.Api().viewer
+    team_name = f"({user_info.teams[0]})" if user_info.teams else ""
+
+    msg: str = (
+        f"Currently logged in as: {user_info.username}{team_name} to "
+        "https://api.wandb.ai. Use `wandb login --relogin` to force relogin"
+    )
+    wandb_logger.info(msg)
+    wandb_logger.info(f"Tracking run with wandb version {wandb.__version__}")  # noqa: G004
+    wandb_logger.info(f"Run data is saved locally in {wandb_run.dir}")  # noqa: G004
+    wandb_logger.info("Run `wandb offline` to turn off syncing.")
+    wandb_logger.info(f"Syncing run {wandb_run.name}")  # noqa: G004
+    wandb_logger.info(f"⭐️ View project at {wandb_run.get_project_url()}")  # noqa: G004
+    wandb_logger.info(f"🚀 View run at {wandb_run.get_url()}")  # noqa: G004
 
     if config is None:
         return

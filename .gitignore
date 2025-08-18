@@ -17,4 +17,10 @@ uv.lock
 outputs
 
 # Weights and Biases logs
-wandb
+wandb_logs
+
+# MLFlow logs
+mlflow_logs
+
+# Ruff Cache
+.ruff_cache

@@ -27,15 +27,20 @@ from pathlib import Path
 
 import torch
 from accelerate import Accelerator
-from hydraxcel import get_logger, hydraxcel_main
 from omegaconf import DictConfig
+
+from hydraxcel import get_logger, hydraxcel_main
 
 __all__ = ["main"]
 logger = get_logger(Path(__file__).stem)
 CONFIGS_DIR = Path(__file__).parent.parent / "configs"
 
 
-@hydraxcel_main("ConfidentLLM", hydra_configs_dir=str(CONFIGS_DIR))
+@hydraxcel_main(
+    "ConfidentLLM",
+    hydra_configs_dir=str(CONFIGS_DIR),
+    logging_platform="mlflow",
+)
 def main(cfg: DictConfig, accelerator: Accelerator) -> None:  # noqa: D103
     x: torch.Tensor = torch.ones((5,)) * cfg.constant
     x = x.to(accelerator.device)

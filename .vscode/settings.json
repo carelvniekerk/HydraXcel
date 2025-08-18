@@ -1,4 +1,15 @@
 {
+    // Configuration for Pytest
+    "python.testing.pytestArgs": [
+        "--cov",
+        "src/hydraxcel",
+        "--verbose",
+        "--cov-report=term-missing"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    //
+    // Configuration for Spell Checking
     "cSpell.words": [
         "addopts",
         "AMAX",
@@ -13,21 +24,15 @@
         "hexsha",
         "hostfile",
         "hydraxcel",
+        "mlflow",
         "mpirun",
         "msamp",
         "multinode",
         "nvfuser",
         "nvme",
         "rdzv",
+        "relogin",
         "reshard",
         "Ruppik"
     ],
-    "python.testing.pytestArgs": [
-        "--cov",
-        "src/hydraxcel",
-        "--verbose",
-        "--cov-report=term-missing"
-    ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
 }
