@@ -24,6 +24,7 @@
 """HydraXcel: Configuration-driven deep learning launcher."""
 
 from hydraxcel.accelerate import launch
+from hydraxcel.logging import LoggingPlatform
 from hydraxcel.run import (
     get_logger,
     hydraxcel_main,
@@ -31,6 +32,7 @@ from hydraxcel.run import (
 )
 
 __all__ = [
+    "LoggingPlatform",
     "get_logger",
     "hydraxcel_main",
     "launch",

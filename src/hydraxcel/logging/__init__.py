@@ -31,6 +31,7 @@ from hydraxcel.logging.init_logging import (
     init_logging_platform,
 )
 from hydraxcel.logging.logger_config import create_logging_config
+from hydraxcel.logging.mlflow_server import run_mlflow_server
 
 __all__ = [
     "LoggingPlatform",
@@ -39,5 +40,6 @@ __all__ = [
     "init_logging_platform",
     "log_accelerator_info",
     "log_system_info",
+    "run_mlflow_server",
     "setup_exception_logging",
 ]
