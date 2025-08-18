@@ -28,41 +28,9 @@ from pathlib import Path
 import wandb
 from omegaconf import DictConfig, OmegaConf
 
+from hydraxcel.logging.helpers import find_project_root
+
 __all__ = ["initialize_wandb"]
-
-
-def find_project_root(current_path: Path, marker: str = "pyproject.toml") -> Path:
-    """Traverse up the directory structure to find the root directory.
-
-    Args:
-    ----
-        current_path (Path): The current file path.
-        marker (str): A marker file or directory indicating the root.
-
-    Returns:
-    -------
-        Path: The root directory path.
-
-    """
-    # Remove the filename if it ends with .py
-    current_path = current_path.resolve()
-    if current_path.suffix == ".py":
-        current_path = current_path.parent
-
-    if (current_path / marker).exists():
-        return current_path
-
-    while current_path != current_path.parent:
-        # Check if any marker exists in the current directory
-        if (current_path / marker).exists():
-            return current_path
-
-        # Move one directory up
-        current_path = current_path.parent
-
-    # If we reach the filesystem root and haven't found the marker, raise an error
-    msg = f"{marker} not found in any parent directories."
-    raise FileNotFoundError(msg)
 
 
 def initialize_wandb(
@@ -74,7 +42,7 @@ def initialize_wandb(
 
     wandb.init(
         project=project_name,
-        dir=str(wandb_path),
+        dir=wandb_path.as_posix(),
         settings=wandb.Settings(
             start_method="thread",  # Note: https://docs.wandb.ai/guides/integrations/hydra#troubleshooting-multiprocessing
             x_service_wait=300,
