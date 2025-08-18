@@ -23,6 +23,7 @@
 # limitations under the License.
 """Example script showcasing the use of HydraXcel."""
 
+from dataclasses import dataclass
 from pathlib import Path
 
 import torch
@@ -36,9 +37,15 @@ logger = get_logger(Path(__file__).stem)
 CONFIGS_DIR = Path(__file__).parent.parent / "configs"
 
 
+@dataclass
+class Config:
+    constant: float = 10.0
+
+
 @hydraxcel_main(
     "ConfidentLLM",
-    hydra_configs_dir=str(CONFIGS_DIR),
+    config_class=Config,
+    # hydra_configs_dir=str(CONFIGS_DIR),
     logging_platform="mlflow",
 )
 def main(cfg: DictConfig, accelerator: Accelerator) -> None:  # noqa: D103

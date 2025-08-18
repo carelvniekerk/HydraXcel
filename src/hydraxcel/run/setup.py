@@ -24,6 +24,7 @@
 """Runner for question answering using the ConfidentLLM package."""
 
 import random
+from dataclasses import is_dataclass
 from functools import wraps
 from pathlib import Path
 from typing import Callable
@@ -160,10 +161,12 @@ def set_seed(seed: int) -> None:
     np.random.default_rng(seed)
 
 
-def hydraxcel_main(
+def hydraxcel_main(  # noqa: PLR0913
     project_name: str,
     *,
-    hydra_configs_dir: str,
+    config_class: type | None = None,
+    output_dir_keys: list[str] | None = None,
+    hydra_configs_dir: str | None = None,
     hydra_base_version: str = "1.3",
     logging_platform: LoggingPlatform | str = LoggingPlatform.WANDB,
 ) -> Callable[Callable[..., None], Callable[..., None]]:
@@ -171,12 +174,30 @@ def hydraxcel_main(
     if not isinstance(logging_platform, LoggingPlatform):
         logging_platform: LoggingPlatform = LoggingPlatform(logging_platform)
 
+    if output_dir_keys is None:
+        output_dir_keys: list[str] = []
+
+    if config_class is not None and hydra_configs_dir is not None:
+        raise ValueError(  # noqa: TRY003
+            "If config_class is provided, hydra_configs_dir cannot be set.",  # noqa: EM101
+        )
+
+    if config_class is not None and not is_dataclass(config_class):
+        raise ValueError("If config_class is provided, it must be a dataclass.")  # noqa: EM101, TRY003
+
     def outer(main_func: Callable[..., None]) -> Callable[..., None]:
         """Run the main function with the Accelerator."""
         job_name = _setup_hydra_config_and_logging(
             file_path=Path(main_func.__code__.co_filename),  # type: ignore[attr-defined]
-            config_keys=["constant"],
+            config_keys=output_dir_keys,  # type: ignore[arg-type] # Ty Bug
         )
+
+        if config_class is not None:
+            hydra_store = ConfigStore.instance().store
+            hydra_store(
+                node=config_class,
+                name=job_name,
+            )
 
         @wraps(main_func)
         @main(
