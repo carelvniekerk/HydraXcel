@@ -86,18 +86,30 @@ def hydra_config_dir(tmp_path: Path, job_name: str, config_constant: int) -> Pat
 
 
 @pytest.fixture
-def wandb_init(monkeypatch: pytest.MonkeyPatch) -> dict[str, str]:
-    """Mock W&B initialization call."""
+def logging_platform_init(
+    monkeypatch: pytest.MonkeyPatch,
+    job_name: str,
+) -> dict[str, str]:
+    """Mock logging platform initialization call."""
     calls: dict[str, str] = {}
 
-    def fake_initialize_wandb(*, config: DictConfig, project_name: str) -> None:
-        calls["project_name"] = project_name
+    def fake_initialize_logging_platform(
+        *,
+        config: DictConfig,
+        project_name: str,
+    ) -> None:
+        calls["project_name"] = f"{project_name}"
         calls["constant"] = getattr(config, "constant", None)
 
     # Patch the symbol imported into hydraxcel.run.setup
     monkeypatch.setattr(
-        "hydraxcel.run.setup.initialize_wandb",
-        fake_initialize_wandb,
+        "hydraxcel.logging.init_logging.initialize_wandb",
+        fake_initialize_logging_platform,
+        raising=True,
+    )
+    monkeypatch.setattr(
+        "hydraxcel.logging.init_logging.initialize_mlflow",
+        fake_initialize_logging_platform,
         raising=True,
     )
     return calls
@@ -113,7 +125,7 @@ def disable_debug(monkeypatch: pytest.MonkeyPatch) -> None:
 @pytest.fixture
 def enable_debug(monkeypatch: pytest.MonkeyPatch) -> str:
     """Enable debug mode for tests."""
-    monkeypatch.setenv("ACCELERATE_DEBUG_MODE", "1")
+    monkeypatch.setenv("ACCELERATE_DEBUG_MODE", "true")
     return "1"
 
 

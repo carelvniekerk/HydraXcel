@@ -29,7 +29,7 @@ from typing import Callable, Iterable, Sequence
 import pytest
 from accelerate import Accelerator
 from hydra.conf import RunDir, SweepDir
-from hydraxcel.run.setup import create_run_dir, hydraxcel_main
+from hydraxcel.run.setup import _create_run_dir, hydraxcel_main
 from omegaconf import DictConfig
 
 
@@ -54,7 +54,7 @@ def test_create_run_dir_standard(
     expected_segments: Sequence[str],
 ) -> None:
     """Standard run dir contains expected ordered placeholders and timestamp."""
-    result = create_run_dir(root_dir=Path("outputs"), config_keys=config_keys)
+    result = _create_run_dir(root_dir=Path("outputs"), config_keys=config_keys)
     ensure(isinstance(result, RunDir), "Result should be RunDir instance")
 
     path_parts = Path(result.dir).parts  # type: ignore[arg-type]
@@ -80,7 +80,7 @@ def test_create_run_dir_sweep(
     expected_sub_segments: Sequence[str],
 ) -> None:
     """Sweep run dir returns root + subdir with placeholders and timestamp."""
-    result = create_run_dir(
+    result = _create_run_dir(
         root_dir=Path("multirun"),
         config_keys=config_keys,
         is_sweep=True,
@@ -105,7 +105,7 @@ def test_create_run_dir_sweep(
 def test_create_run_dir_path_order_is_preserved() -> None:
     """Config key order should be preserved in final path segments."""
     keys = ["alpha", "beta", "gamma"]
-    result = create_run_dir(root_dir=Path("outputs"), config_keys=keys)
+    result = _create_run_dir(root_dir=Path("outputs"), config_keys=keys)
     parts = Path(result.dir).parts  # type: ignore[arg-type]
     placeholders: Iterable[str] = parts[2:-1]  # skip root + job name + final timestamp
     ensure(
@@ -117,7 +117,7 @@ def test_create_run_dir_path_order_is_preserved() -> None:
 def test_hydraxcel_main_wandb(  # noqa: PLR0913
     isolated_cwd: Path,  # noqa: ARG001
     hydra_config_dir: Path,
-    wandb_init: dict[str, str],
+    logging_platform_init: dict[str, str],
     job_name: str,
     make_user_main: Callable[
         [dict[str, str] | None],
@@ -133,16 +133,20 @@ def test_hydraxcel_main_wandb(  # noqa: PLR0913
     wrapped = hydraxcel_main(
         project_name="demo",
         hydra_configs_dir=str(hydra_config_dir),
+        logging_platform="wandb",
     )(user_main)
 
     wrapped()  # Hydra entrypoint
 
     ensure("device" in received, "Expected 'device' in received")
     ensure(
-        wandb_init["project_name"] == f"demo-{job_name}",
-        "Unexpected W&B project name",
+        logging_platform_init["project_name"] == f"demo-{job_name}",
+        "Unexpected logging platform project name",
     )
-    ensure(wandb_init["constant"] == config_constant, "Unexpected W&B constant")
+    ensure(
+        logging_platform_init["constant"] == config_constant,
+        "Unexpected logging platform constant",
+    )
     # Working directory should now be inside outputs/
     ensure(
         "outputs" in received["working_dir"],
@@ -153,7 +157,7 @@ def test_hydraxcel_main_wandb(  # noqa: PLR0913
 def test_hydraxcel_main_debug_skips_wandb(
     isolated_cwd: Path,  # noqa: ARG001
     hydra_config_dir: Path,
-    wandb_init: dict[str, str],
+    logging_platform_init: dict[str, str],
     make_user_main: Callable[
         [dict[str, str] | None],
         Callable[[DictConfig, Accelerator], None],
@@ -171,13 +175,16 @@ def test_hydraxcel_main_debug_skips_wandb(
 
     wrapped()  # Hydra entrypoint
 
-    ensure(wandb_init == {}, "W&B should not have been initialized in debug mode")
+    ensure(
+        logging_platform_init == {},
+        "Logging platform should not have been initialized in debug mode",
+    )
 
 
 def test_multiple_invocations_clean_state(  # noqa: PLR0913
     isolated_cwd: Path,  # noqa: ARG001
     hydra_config_dir: Path,
-    wandb_init: dict[str, str],
+    logging_platform_init: dict[str, str],
     job_name: str,
     make_user_main: Callable[
         [dict[str, str] | None],
@@ -196,6 +203,6 @@ def test_multiple_invocations_clean_state(  # noqa: PLR0913
     wrapped()
     wrapped()  # second call should still work
     ensure(
-        wandb_init["project_name"] == f"demo-{job_name}",
-        "Unexpected W&B project name",
+        logging_platform_init["project_name"] == f"demo-{job_name}",
+        "Unexpected logging platform project name",
     )
