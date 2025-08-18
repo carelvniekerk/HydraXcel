@@ -25,9 +25,9 @@
 
 from pathlib import Path
 
+import mlflow
 from omegaconf import DictConfig, OmegaConf
 
-import mlflow
 from hydraxcel.logging.helpers import find_project_root, flatten_dict
 
 __all__ = ["initialize_mlflow"]
@@ -36,7 +36,7 @@ __all__ = ["initialize_mlflow"]
 def initialize_mlflow(  # noqa: PLR0913
     config: DictConfig | None = None,
     experiment_name: str = "ConfidentLLM",
-    tracking_subdir: str = "mlflow",
+    tracking_subdir: str = "mlflow_logs",
     run_name: str | None = None,
     *,
     nested: bool = False,

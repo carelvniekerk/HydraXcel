@@ -39,7 +39,7 @@ def initialize_wandb(
     project_name: str = "ConfidentLLM",
 ) -> None:
     """Initialize wandb."""
-    wandb_path = find_project_root(Path(__file__))
+    wandb_path = find_project_root(Path(__file__)) / "wandb_logs"
     wandb.init(
         project=project_name,
         dir=wandb_path.as_posix(),
