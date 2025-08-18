@@ -31,6 +31,7 @@
         "nvfuser",
         "nvme",
         "rdzv",
+        "relogin",
         "reshard",
         "Ruppik"
     ],

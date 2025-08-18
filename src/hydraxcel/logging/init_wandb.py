@@ -23,6 +23,8 @@
 # limitations under the License.
 """Initialise the weights and biases logging."""
 
+import logging
+import os
 from pathlib import Path
 
 import wandb
@@ -39,8 +41,10 @@ def initialize_wandb(
     project_name: str = "ConfidentLLM",
 ) -> None:
     """Initialize wandb."""
+    os.environ["WANDB_SILENT"] = "true"
+
     wandb_path = find_project_root(Path(__file__)) / "wandb_logs"
-    wandb.init(
+    wandb_run: wandb.Run = wandb.init(
         project=project_name,
         dir=wandb_path.as_posix(),
         settings=wandb.Settings(
@@ -49,6 +53,27 @@ def initialize_wandb(
             init_timeout=300,
         ),
     )
+
+    # Clear wandb's internal logging to avoid duplicate messages
+    wandb_logger = logging.getLogger("wandb")
+    wandb_logger.handlers.clear()
+    wandb_logger.propagate = True
+
+    # Get user info and log it
+    user_info = wandb.Api().viewer
+    team_name = f"({user_info.teams[0]})" if user_info.teams else ""
+
+    msg: str = (
+        f"Currently logged in as: {user_info.username}{team_name} to "
+        "https://api.wandb.ai. Use `wandb login --relogin` to force relogin"
+    )
+    wandb_logger.info(msg)
+    wandb_logger.info(f"Tracking run with wandb version {wandb.__version__}")  # noqa: G004
+    wandb_logger.info(f"Run data is saved locally in {wandb_run.dir}")  # noqa: G004
+    wandb_logger.info(f"Run `wandb offline` to turn off syncing.")  # noqa: G004
+    wandb_logger.info(f"Syncing run {wandb_run.name}")  # noqa: G004
+    wandb_logger.info(f"⭐️ View project at {wandb_run.get_project_url()}")  # noqa: G004
+    wandb_logger.info(f"🚀 View run at {wandb_run.get_url()}")  # noqa: G004
 
     if config is None:
         return

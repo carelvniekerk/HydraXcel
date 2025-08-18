@@ -23,6 +23,7 @@
 # limitations under the License.
 """Initialise the weights and biases logging."""
 
+import logging
 from pathlib import Path
 
 import mlflow
@@ -56,6 +57,10 @@ def initialize_mlflow(  # noqa: PLR0913
         The active MLflow run.
 
     """
+    logger = logging.getLogger("mlflow")
+    logger.handlers.clear()
+    logger.propagate = True
+
     project_root: Path = find_project_root(Path(__file__))
     tracking_dir: Path = project_root / tracking_subdir
     tracking_dir.mkdir(parents=True, exist_ok=True)

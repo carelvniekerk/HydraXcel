@@ -61,7 +61,7 @@ def get_logger(
     if setup_transformers_logger:
         # Get the transformer logger and propagate its logs to the Hydra root.
         transformers_logger: logging.Logger = transformers.utils.logging.get_logger()  # type: ignore[unresolved-attribute] # TODO: Remove when ty bug is fixed
-        transformers_logger.handlers = []
+        transformers_logger.handlers.clear()
         transformers_logger.propagate = True
 
     return logger
