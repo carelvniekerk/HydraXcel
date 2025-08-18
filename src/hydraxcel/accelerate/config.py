@@ -277,6 +277,8 @@ class LaunchConfig:
             raise ValueError(msg)
 
     def _validate_zero_stage(self) -> None:
+        if not self.use_deepspeed:
+            return
         if self.zero_stage not in {1, 2, 3}:
             msg = "zero_stage must be 1, 2 or 3 when set"
             raise ValueError(msg)
