@@ -70,7 +70,7 @@ def initialize_wandb(
     wandb_logger.info(msg)
     wandb_logger.info(f"Tracking run with wandb version {wandb.__version__}")  # noqa: G004
     wandb_logger.info(f"Run data is saved locally in {wandb_run.dir}")  # noqa: G004
-    wandb_logger.info(f"Run `wandb offline` to turn off syncing.")  # noqa: G004
+    wandb_logger.info("Run `wandb offline` to turn off syncing.")
     wandb_logger.info(f"Syncing run {wandb_run.name}")  # noqa: G004
     wandb_logger.info(f"⭐️ View project at {wandb_run.get_project_url()}")  # noqa: G004
     wandb_logger.info(f"🚀 View run at {wandb_run.get_url()}")  # noqa: G004

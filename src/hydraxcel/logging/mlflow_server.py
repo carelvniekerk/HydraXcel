@@ -30,7 +30,6 @@ from pathlib import Path
 
 from hydra import main
 from hydra.core.config_store import ConfigStore
-
 from mlflow.server import _run_server
 from mlflow.server.handlers import initialize_backend_stores
 from mlflow.utils.process import ShellCommandException

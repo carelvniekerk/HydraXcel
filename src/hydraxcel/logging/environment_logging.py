@@ -34,8 +34,6 @@ import torch
 from accelerate import Accelerator
 from git import Repo
 
-from hydraxcel.logging.init_logging import get_logger
-
 __all__ = [
     "log_accelerator_info",
     "log_system_info",
@@ -49,7 +47,7 @@ def log_system_info() -> None:
     except Exception:  # noqa: BLE001 - We want to proceed no matter what the error is
         hostname = "sys"
 
-    logger: logging.Logger = get_logger(hostname)
+    logger: logging.Logger = logging.getLogger(hostname)
 
     logger.info(
         msg=f"Running on {hostname = }",  # noqa: G004 - low overhead
@@ -61,7 +59,7 @@ def log_system_info() -> None:
 
 def _log_git_info() -> None:
     """Get the git info of the current branch and commit hash."""
-    logger = get_logger("git")
+    logger = logging.getLogger("git")
     try:
         repo = Repo(
             path=Path(__file__).resolve().parent,

@@ -1,4 +1,4 @@
-# coding=utf-8  # noqa: INP001
+# coding=utf-8
 # --------------------------------------------------------------------------------
 # Project: HydraXcel
 # Author: Carel van Niekerk
