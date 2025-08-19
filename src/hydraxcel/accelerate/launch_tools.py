@@ -76,9 +76,13 @@ def launch(
             raise ValueError(  # noqa: TRY003
                 "Training script is already set, will be overwritten.",  # noqa: EM101
             )
-
         if not hasattr(cfg, "training_script"):
-            cfg.training_script = ""
+            msg: str = (
+                "When using dataclass config for launching, the training_script"
+                "and training_script_args must be set to '' and [] respectively."
+            )
+            raise ValueError(msg)
+
         cfg.training_script = str(script_path)
         cfg.training_script_args = passthrough_args
 
