@@ -33,16 +33,20 @@ __all__ = [
 
 
 def flatten_config(
-    configuration: DictConfig,
+    configuration: DictConfig | dict[str, Any],
     *,
     max_depth: int | None = 5,
 ) -> dict[str, Any]:
     """Flatten nested configurations for hydra."""
-    config_dict: dict[str, Any] = OmegaConf.to_container(configuration, resolve=True)  # type: ignore[assignment]
+    if isinstance(configuration, DictConfig):
+        configuration: dict[str, Any] = OmegaConf.to_container(  # type: ignore[assignment]
+            configuration,
+            resolve=True,
+        )
     items: dict[str, Any] = {}
     if max_depth is not None and max_depth < 0:
         return items
-    for key, value in config_dict.items():
+    for key, value in configuration.items():
         if isinstance(value, dict):
             items.update(
                 flatten_config(
