@@ -25,6 +25,7 @@
 
 import sys
 from argparse import Namespace
+from dataclasses import asdict
 from pathlib import Path
 from typing import Callable
 
@@ -33,6 +34,7 @@ from hydra import main
 from hydra.core.config_store import ConfigStore
 
 from hydraxcel.accelerate.config import LaunchConfig
+from hydraxcel.hydra import flatten_config
 
 __all__ = ["launch"]
 _config_store = ConfigStore.instance()
@@ -73,6 +75,20 @@ def launch(
         cfg.training_script = str(script_path)
         cfg.training_script_args = passthrough_args
 
-        launch_command(Namespace(**cfg))
+        # Flatten and validate the configuration
+        cfg: dict = flatten_config(cfg)  # type: ignore[invalid-argument-type]
+        for key in [
+            "deepspeed_fields_from_accelerate_config",
+            "use_cpu",
+            "use_xpu",
+            "nproc_per_node",
+            "master_port",
+        ]:
+            cfg.pop(key, None)
+
+        cfg = asdict(LaunchConfig(**cfg))
+        cfg: Namespace = Namespace(**cfg)
+
+        launch_command(cfg)
 
     return launch_fn

@@ -84,7 +84,7 @@ def test_launch_injects_script_and_args_with_delimiter(
     monkeypatch.setattr(
         sys,
         "argv",
-        ["prog", "--lr", "3e-4", "--batch", "8", "--", "+dummy=1"],
+        ["prog", "--lr", "3e-4", "--batch", "8", "--", "cpu=True"],
     )
 
     captured: dict[str, str | list[str]] = {}
@@ -107,6 +107,6 @@ def test_launch_injects_script_and_args_with_delimiter(
     )
     # sys.argv after extraction keeps items after '--' (Hydra sees them)
     ensure(
-        sys.argv == ["prog", "+dummy=1"],
+        sys.argv == ["prog", "cpu=True"],
         "sys.argv was not trimmed correctly",
     )
