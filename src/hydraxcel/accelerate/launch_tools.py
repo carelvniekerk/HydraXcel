@@ -35,6 +35,7 @@ from hydra.core.config_store import ConfigStore
 
 from hydraxcel.accelerate.config import LaunchConfig
 from hydraxcel.hydra import flatten_config
+from hydraxcel.run.setup import _setup_hydra_config_and_logging
 
 __all__ = ["launch"]
 _config_store = ConfigStore.instance()
@@ -64,6 +65,12 @@ def launch(
 ) -> Callable[[LaunchConfig], None]:
     """Launch a script at a given path."""
     passthrough_args = _extract_pass_through_args()
+
+    _setup_hydra_config_and_logging(
+        file_path=Path("accelerate"),
+        config_keys=[],
+        change_to_output_dir=False,
+    )
 
     @main(
         config_path=hydra_configs_dir,

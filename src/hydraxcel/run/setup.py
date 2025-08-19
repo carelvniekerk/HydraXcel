@@ -48,6 +48,7 @@ from hydraxcel.logging import (
 )
 
 __all__ = [
+    "_setup_hydra_config_and_logging",
     "hydraxcel_main",
     "set_seed",
 ]
