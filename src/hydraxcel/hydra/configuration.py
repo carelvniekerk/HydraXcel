@@ -23,12 +23,14 @@
 # limitations under the License.
 """Tools for hydra and configuration management."""
 
+from dataclasses import field, make_dataclass
 from typing import Any
 
 from omegaconf import DictConfig, OmegaConf
 
 __all__ = [
     "flatten_config",
+    "hydra_config",
 ]
 
 
@@ -57,3 +59,26 @@ def flatten_config(
         else:
             items[key] = value
     return items
+
+
+def hydra_config(
+    name: str,
+    *,
+    defaults: list[str | dict[str, str]] | None = None,
+    add_training_script_placeholder: bool = False,
+) -> type:
+    """Create a Hydra configuration dataclass."""
+    defaults = [] if defaults is None else defaults
+    values: list[tuple[str, Any, Any]] = [
+        (
+            "defaults",
+            list[Any],
+            field(default_factory=lambda: defaults),
+        ),
+    ]
+
+    if add_training_script_placeholder:
+        values.append(("training_script", str, field(default="")))
+        values.append(("training_script_args", list[str], field(default_factory=list)))
+
+    return make_dataclass(name, values)

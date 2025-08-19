@@ -23,8 +23,14 @@
 # limitations under the License.
 """Tools for hydra and configuration management."""
 
-from hydraxcel.hydra.configuration import flatten_config
+from hydra.core.config_store import ConfigStore
+
+from hydraxcel.hydra.configuration import flatten_config, hydra_config
 
 __all__ = [
+    "config_store",
     "flatten_config",
+    "hydra_config",
 ]
+
+config_store: ConfigStore = ConfigStore.instance()
