@@ -58,7 +58,7 @@ def _extract_pass_through_args() -> list[str]:
 def launch(
     script_path: Path,
     *,
-    hydra_configs_dir: str,
+    hydra_configs_dir: str | None = None,
     config_name: str = "accelerate",
     hydra_base_version: str = "1.3",
 ) -> Callable[[LaunchConfig], None]:
