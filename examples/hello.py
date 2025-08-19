@@ -34,7 +34,7 @@ from hydraxcel import get_logger, hydraxcel_main
 
 __all__ = ["main"]
 logger = get_logger(Path(__file__).stem)
-CONFIGS_DIR = Path(__file__).parent.parent / "configs"
+CONFIGS_DIR = Path(__file__).parent / "configs"
 
 
 @dataclass

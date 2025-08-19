@@ -29,7 +29,7 @@ from hydraxcel.accelerate import launch
 
 __all__ = ["hello"]
 SCRIPTS_PATH: Path = Path(__file__).parent
-CONFIGS_PATH: Path = SCRIPTS_PATH.parent / "configs"
+CONFIGS_PATH: Path = SCRIPTS_PATH / "configs"
 
 launch_hello = launch(
     SCRIPTS_PATH / "hello.py",
