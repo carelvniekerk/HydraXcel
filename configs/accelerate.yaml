@@ -5,5 +5,3 @@ defaults:
 - accelerate/paradigm: torch_ddp
 - accelerate/precision: bf16
 - _self_
-
-training_script: ""

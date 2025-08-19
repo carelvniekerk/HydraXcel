@@ -72,6 +72,13 @@ def launch(
     )
     def launch_fn(cfg: LaunchConfig) -> None:
         """Run the main entry point for the script."""
+        if hasattr(cfg, "training_script") and cfg.training_script:
+            raise ValueError(  # noqa: TRY003
+                "Training script is already set, will be overwritten.",  # noqa: EM101
+            )
+
+        if not hasattr(cfg, "training_script"):
+            cfg.training_script = ""
         cfg.training_script = str(script_path)
         cfg.training_script_args = passthrough_args
 
