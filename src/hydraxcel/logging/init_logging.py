@@ -72,12 +72,13 @@ def init_logging_platform(
     config: DictConfig,
     project_name: str,
     task_name: str,
+    accelerator: Accelerator | None = None,
 ) -> None:
     """Initialize the logging platform."""
     if platform == LoggingPlatform.LOCAL:
         return
 
-    if not Accelerator().is_main_process:
+    if accelerator is not None and not accelerator.is_main_process:
         return
     if os.getenv("ACCELERATE_DEBUG_MODE", default=False):  # noqa: PLW1508
         return
@@ -92,10 +93,15 @@ def init_logging_platform(
 
     if platform == LoggingPlatform.WANDB:
         project_name: str = f"{project_name}-{task_name}"
-        initialize_wandb(config=config, project_name=project_name)
+        initialize_wandb(
+            config=config,
+            project_name=project_name,
+            accelerator=accelerator,
+        )
     elif platform == LoggingPlatform.MLFLOW:
         initialize_mlflow(
             config=config,
             experiment_name=project_name,
             run_name=task_name,
+            accelerator=accelerator,
         )

@@ -24,6 +24,7 @@
 """Runner for question answering using the ConfidentLLM package."""
 
 import random
+import sys
 from dataclasses import is_dataclass
 from functools import wraps
 from pathlib import Path
@@ -36,6 +37,7 @@ from hydra import main
 from hydra.conf import HydraConf, JobConf, RunDir, SweepDir
 from hydra.core.config_store import ConfigStore
 from omegaconf import DictConfig
+from wandb.sdk.lib import redirect as wandb_redirect
 
 from hydraxcel.logging import (
     LoggingPlatform,
@@ -215,8 +217,18 @@ def hydraxcel_main(  # noqa: PLR0913
                 config=cfg,
                 project_name=project_name,
                 task_name=job_name,
+                accelerator=accelerator,
             )
-            main_func(cfg, accelerator)
+            try:
+                main_func(cfg, accelerator)
+            finally:
+                # Do not manually end WANDB run
+                accelerator.trackers = (
+                    []
+                    if logging_platform == LoggingPlatform.WANDB
+                    else accelerator.trackers
+                )
+                accelerator.end_training()
 
         return acc_main_func
 
