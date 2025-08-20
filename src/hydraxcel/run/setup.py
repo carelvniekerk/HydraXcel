@@ -24,7 +24,6 @@
 """Runner for question answering using the ConfidentLLM package."""
 
 import random
-import sys
 from dataclasses import is_dataclass
 from functools import wraps
 from pathlib import Path
@@ -37,7 +36,6 @@ from hydra import main
 from hydra.conf import HydraConf, JobConf, RunDir, SweepDir
 from hydra.core.config_store import ConfigStore
 from omegaconf import DictConfig
-from wandb.sdk.lib import redirect as wandb_redirect
 
 from hydraxcel.logging import (
     LoggingPlatform,

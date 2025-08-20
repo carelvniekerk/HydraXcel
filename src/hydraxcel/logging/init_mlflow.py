@@ -55,6 +55,7 @@ def initialize_mlflow(  # noqa: PLR0913
         run_name: Optional MLflow run name.
         nested: Start a nested run if already inside a parent run.
         max_value_len: Maximum length for parameter values.
+        accelerator: Optional Accelerator instance for distributed training.
 
     Returns:
         The active MLflow run.
