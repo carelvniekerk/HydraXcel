@@ -200,12 +200,6 @@ def hydraxcel_main(  # noqa: PLR0913
                 name=job_name,
             )
 
-        accelerate_logger: str | None = (
-            logging_platform.value  # type: ignore[unresolved-attribute]
-            if logging_platform != LoggingPlatform.LOCAL
-            else None
-        )
-
         @wraps(main_func)
         @main(
             version_base=hydra_base_version,
@@ -214,7 +208,7 @@ def hydraxcel_main(  # noqa: PLR0913
         )
         def acc_main_func(cfg: DictConfig) -> None:
             log_system_info()
-            accelerator: Accelerator = Accelerator(log_with=accelerate_logger)
+            accelerator: Accelerator = Accelerator()
             log_accelerator_info(accelerator)
             init_logging_platform(
                 platform=logging_platform,  # type: ignore[invalid-argument-type]
