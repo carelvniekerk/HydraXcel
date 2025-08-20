@@ -27,6 +27,8 @@ import logging
 from pathlib import Path
 
 import mlflow
+from accelerate import Accelerator
+from accelerate.tracking import MLflowTracker
 from omegaconf import DictConfig, OmegaConf
 
 from hydraxcel.logging.helpers import find_project_root, flatten_dict
@@ -42,6 +44,7 @@ def initialize_mlflow(  # noqa: PLR0913
     *,
     nested: bool = False,
     max_value_len: int = 250,
+    accelerator: Accelerator | None = None,
 ) -> None:
     """Initialize MLflow tracking.
 
@@ -60,6 +63,9 @@ def initialize_mlflow(  # noqa: PLR0913
     logger = logging.getLogger("mlflow")
     logger.handlers.clear()
     logger.propagate = True
+
+    if accelerator is not None:
+        accelerator.trackers.append(MLflowTracker())
 
     project_root: Path = find_project_root(Path(__file__))
     tracking_dir: Path = project_root / tracking_subdir

@@ -28,6 +28,8 @@ import os
 from pathlib import Path
 
 import wandb
+from accelerate import Accelerator
+from accelerate.tracking import WandBTracker
 from omegaconf import DictConfig, OmegaConf
 
 from hydraxcel.logging.helpers import find_project_root
@@ -39,6 +41,7 @@ def initialize_wandb(
     *,
     config: DictConfig | None = None,
     project_name: str = "ConfidentLLM",
+    accelerator: Accelerator | None = None,
 ) -> None:
     """Initialize wandb."""
     os.environ["WANDB_SILENT"] = "true"
@@ -53,6 +56,11 @@ def initialize_wandb(
             init_timeout=300,
         ),
     )
+
+    if accelerator is not None:
+        accelerate_tracker = WandBTracker(project_name)
+        accelerate_tracker.run = wandb_run
+        accelerator.trackers.append(accelerate_tracker)
 
     # Clear wandb's internal logging to avoid duplicate messages
     wandb_logger = logging.getLogger("wandb")
