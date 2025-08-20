@@ -100,9 +100,14 @@ def flatten_dict(
 class MainProcessFilter(logging.Filter):
     """Pass records only on main (rank 0) process."""
 
+    def __init__(self, name: str = "") -> None:
+        """Initialize the logging filter."""
+        super().__init__(name)
+        self._is_main_process = Accelerator().is_main_process
+
     def filter(self, record: logging.LogRecord) -> bool:  # noqa: ARG002 # Needed for logging filter function signature
         """Pass records only on main (rank 0) process."""
         try:
-            return Accelerator().is_main_process
+            return self._is_main_process
         except (RuntimeError, ValueError):
             return False
