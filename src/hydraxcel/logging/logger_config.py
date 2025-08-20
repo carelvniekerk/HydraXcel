@@ -57,15 +57,23 @@ def create_logging_config(
     if colorlog_console:
         formatters["colored"] = colored_formatter
 
+    filters: dict[str, dict[str, str]] = {
+        "main_process": {
+            "()": "hydraxcel.logging.helpers.MainProcessFilter",
+        },
+    }
+
     handlers: dict[str, dict[str, str]] = {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "colored" if colorlog_console else "simple",
+            "filters": ["main_process"],
             "stream": "ext://sys.stdout",
         },
         "file": {
             "class": "logging.FileHandler",
             "formatter": "simple",
+            "filters": ["main_process"],
             "filename": str(log_file),
         },
     }
@@ -78,6 +86,7 @@ def create_logging_config(
     log_config: dict[str, dict | int] = {
         "version": 1,
         "formatters": formatters,
+        "filters": filters,
         "handlers": handlers,
         "root": root,
         "disable_existing_loggers": False,

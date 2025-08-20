@@ -23,10 +23,17 @@
 # limitations under the License.
 """Logging helper functions for HydraXcel."""
 
+import logging
 from pathlib import Path
 from typing import Any
 
-__all__ = ["find_project_root", "flatten_dict"]
+from accelerate import Accelerator
+
+__all__ = [
+    "MainProcessFilter",
+    "find_project_root",
+    "flatten_dict",
+]
 
 
 def find_project_root(current_path: Path, marker: str = "pyproject.toml") -> Path:
@@ -88,3 +95,14 @@ def flatten_dict(
         else:
             items[new_key] = value
     return items
+
+
+class MainProcessFilter(logging.Filter):
+    """Pass records only on main (rank 0) process."""
+
+    def filter(self, record: logging.LogRecord) -> bool:  # noqa: ARG002 # Needed for logging filter function signature
+        """Pass records only on main (rank 0) process."""
+        try:
+            return Accelerator().is_main_process
+        except (RuntimeError, ValueError):
+            return False
