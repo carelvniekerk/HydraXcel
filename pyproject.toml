@@ -4,7 +4,7 @@ version = "0.1.0a"
 description = "HydraXcel: Configuration-driven deep learning launcher combining Hydra, Accelerate, and UV for fast, reproducible experiments."
 readme = "README.md"
 authors = [{ name = "Carel van Niekerk", email = "vniekerk.carel@gmail.com" }]
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "accelerate>=1.10.0",
     "colorlog>=6.9.0",
