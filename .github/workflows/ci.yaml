@@ -28,6 +28,7 @@ jobs:
     # (Optional) Show dependency graph
     - name: Resolve & sync environment
       run: |
+        uv python pip 3.13
         uv sync --all-extras --dev
         uv tool install ruff
 
