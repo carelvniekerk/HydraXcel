@@ -35,6 +35,15 @@ from omegaconf import DictConfig, OmegaConf
 from hydraxcel.logging.init_mlflow import initialize_mlflow
 from hydraxcel.logging.init_wandb import initialize_wandb
 
+try:
+    from deepspeed.utils import (  # type: ignore[unresolved-import]
+        logger as deepspeed_logger,
+    )
+
+    SETUP_DEEPSPEED_LOGGER = True
+except ImportError:
+    SETUP_DEEPSPEED_LOGGER = False
+
 __all__ = [
     "LoggingPlatform",
     "get_logger",
@@ -54,6 +63,7 @@ def get_logger(
     name: str = "__main__",
     *,
     setup_transformers_logger: bool = True,
+    setup_deepspeed_logger: bool = SETUP_DEEPSPEED_LOGGER,
 ) -> logging.Logger:
     """Get the logger."""
     logger: logging.Logger = logging.getLogger(name)
@@ -63,6 +73,10 @@ def get_logger(
         transformers_logger: logging.Logger = transformers.utils.logging.get_logger()  # type: ignore[unresolved-attribute] # TODO: Remove when ty bug is fixed
         transformers_logger.handlers.clear()
         transformers_logger.propagate = True
+
+    if setup_deepspeed_logger and SETUP_DEEPSPEED_LOGGER:
+        deepspeed_logger.handlers.clear()
+        deepspeed_logger.propagate = True
 
     return logger
 
