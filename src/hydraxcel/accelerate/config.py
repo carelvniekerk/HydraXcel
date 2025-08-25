@@ -59,7 +59,7 @@ class LaunchConfig:
         "SHARD_GRAD_OP",
         "NO_SHARD",
     }
-    _FP8_BACKEND_CHOICES: ClassVar[set[str]] = {"te", "msamp", "ao"}
+    _FP8_BACKEND_CHOICES: ClassVar[set[str]] = {"TE", "MSAMP", "AO"}
     _FP8_FORMAT_CHOICES: ClassVar[set[str]] = {"HYBRID", "E4M3", "E5M2"}
     _FP8_AMAX_ALGO_CHOICES: ClassVar[set[str]] = {
         "most_recent",
