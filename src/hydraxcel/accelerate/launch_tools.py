@@ -44,6 +44,8 @@ _config_store.store(name="launch_config", node=LaunchConfig)
 
 def _extract_pass_through_args() -> list[str]:
     """Extract passthrough arguments from sys.argv."""
+    if "-m" in sys.argv:
+        return []
     if "--" in sys.argv:
         idx = sys.argv.index("--")
         passthrough: list[str] = sys.argv[1:idx]
