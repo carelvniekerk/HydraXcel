@@ -62,6 +62,7 @@ def launch(
     hydra_configs_dir: str | None = None,
     config_name: str = "accelerate",
     hydra_base_version: str = "1.3",
+    add_hydra_hpc_launcher: bool = False,
 ) -> Callable[[LaunchConfig], None]:
     """Launch a script at a given path."""
     passthrough_args = _extract_pass_through_args()
@@ -70,6 +71,7 @@ def launch(
         file_path=Path("accelerate"),
         config_keys=[],
         change_to_output_dir=False,
+        add_hpc_launcher=add_hydra_hpc_launcher,
     )
 
     @main(
