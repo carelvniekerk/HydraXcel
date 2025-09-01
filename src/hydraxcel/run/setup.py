@@ -97,7 +97,7 @@ def _setup_hydra_config_and_logging(
     file_path: Path = Path(__file__),
     config_keys: list[str],
     change_to_output_dir: bool = True,
-    add_hpc_launcher: bool = False,
+    add_submission_launcher: bool = False,
 ) -> str:
     """Set up Hydra configuration and logging."""
     job_name: str = file_path.stem
@@ -111,12 +111,12 @@ def _setup_hydra_config_and_logging(
         config_keys=config_keys,
     )
     sweep_dir: SweepDir = _create_run_dir(  # type: ignore[assignment]
-        root_dir=Path("multirun") if not add_hpc_launcher else Path("hpc_jobs"),
+        root_dir=Path("multirun"),
         config_keys=config_keys,
         is_sweep=True,
     )
 
-    if add_hpc_launcher:
+    if add_submission_launcher:
         hydra_defaults: list[str | dict[str, str | None]] = [
             # Standard defaults
             "_self_",
@@ -126,7 +126,7 @@ def _setup_hydra_config_and_logging(
             {"hydra_logging": "default"},
             {"callbacks": None},
             # Set launcher
-            {"launcher": "hpc_submission"},
+            {"launcher": "job_submission"},
         ]
 
         hydra_config: HydraConf = HydraConf(
@@ -170,6 +170,7 @@ def hydraxcel_main(  # noqa: PLR0913
     hydra_configs_dir: str | None = None,
     hydra_base_version: str = "1.3",
     logging_platform: LoggingPlatform | str = LoggingPlatform.WANDB,
+    add_hydra_submission_launcher: bool = False,
 ) -> Callable[Callable[..., None], Callable[..., None]]:
     """Wrap a main function to run with the Accelerator and configure it using Hydra."""
     if not isinstance(logging_platform, LoggingPlatform):
@@ -191,6 +192,7 @@ def hydraxcel_main(  # noqa: PLR0913
         job_name = _setup_hydra_config_and_logging(
             file_path=Path(main_func.__code__.co_filename),  # type: ignore[attr-defined]
             config_keys=output_dir_keys,  # type: ignore[arg-type] # Ty Bug
+            add_submission_launcher=add_hydra_submission_launcher,
         )
 
         if config_class is not None:
