@@ -44,17 +44,33 @@ _config_store.store(name="launch_config", node=LaunchConfig)
 
 def _extract_pass_through_args() -> list[str]:
     """Extract passthrough arguments from sys.argv."""
+    is_multirun: bool = False
     if "-m" in sys.argv:
-        return []
+        sys.argv.pop(sys.argv.index("-m"))
+        is_multirun = True
+    if "--multirun" in sys.argv:
+        sys.argv.pop(sys.argv.index("--multirun"))
+        is_multirun = True
     if "--" in sys.argv:
         idx = sys.argv.index("--")
         passthrough: list[str] = sys.argv[1:idx]
+        if is_multirun:
+            passthrough = ["-m", *passthrough]
+            launch_args = [f"+launch.{arg}" for arg in sys.argv[idx + 1 :]]
+            launch_args = [f"+launch.script={sys.argv[0]}", *launch_args]
+            passthrough += launch_args
         sys.argv = [sys.argv[0], *sys.argv[idx + 1 :]]
         return passthrough
     if len(sys.argv) > 1:
         passthrough = sys.argv[1:]
+        if is_multirun:
+            passthrough = ["-m", *passthrough]
+            launch_args = f"+launch.script={sys.argv[0]}"
+            passthrough.append(launch_args)
         sys.argv = [sys.argv[0]]
         return passthrough
+    if is_multirun:
+        return ["-m", f"+launch.script={sys.argv[0]}"]
     return []
 
 
@@ -64,7 +80,6 @@ def launch(
     hydra_configs_dir: str | None = None,
     config_name: str = "accelerate",
     hydra_base_version: str = "1.3",
-    add_hydra_hpc_launcher: bool = False,
 ) -> Callable[[LaunchConfig], None]:
     """Launch a script at a given path."""
     passthrough_args = _extract_pass_through_args()
@@ -73,7 +88,6 @@ def launch(
         file_path=Path("accelerate"),
         config_keys=[],
         change_to_output_dir=False,
-        add_hpc_launcher=add_hydra_hpc_launcher,
     )
 
     @main(
