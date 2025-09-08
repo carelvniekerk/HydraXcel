@@ -23,6 +23,7 @@
 # limitations under the License.
 """Custom launcher for using accelerate in uv script commands."""
 
+import subprocess
 import sys
 from argparse import Namespace
 from dataclasses import asdict
@@ -73,7 +74,9 @@ def _extract_pass_through_args() -> list[str]:
             passthrough = ["-m", *passthrough]
             launch_args = _format_multirun_launch_args(sys.argv[0], sys.argv[idx + 1 :])
             passthrough.extend(launch_args)
-        sys.argv = [sys.argv[0], *sys.argv[idx + 1 :]]
+        sys.argv = (
+            [sys.argv[0], *sys.argv[idx + 1 :]] if not is_multirun else [sys.argv[0]]
+        )
         return passthrough
     if len(sys.argv) > 1:
         passthrough = sys.argv[1:]
@@ -122,7 +125,7 @@ def launch(
             )
             raise ValueError(msg)
 
-        cfg.training_script = str(script_path)
+        cfg.training_script = script_path.as_posix()
         cfg.training_script_args = passthrough_args
 
         # Flatten and validate the configuration
@@ -139,6 +142,11 @@ def launch(
         cfg = asdict(LaunchConfig(**cfg))
         cfg: Namespace = Namespace(**cfg)
 
+        # If -m is in the passthrough args, run the script directly
+        if "-m" in passthrough_args:
+            cmd = ["uv", "run", script_path.as_posix(), *passthrough_args]
+            subprocess.run(cmd, check=True)  # noqa: S603
+            sys.exit(0)
         launch_command(cfg)
 
     return launch_fn
