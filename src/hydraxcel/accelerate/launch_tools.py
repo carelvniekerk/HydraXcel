@@ -42,6 +42,21 @@ _config_store = ConfigStore.instance()
 _config_store.store(name="launch_config", node=LaunchConfig)
 
 
+def _format_multirun_launch_args(
+    script: str,
+    launch_args: list[str] | None = None,
+) -> list[str]:
+    formatted_launch_args: list[str] = [f"+launch.script={script}"]
+    if launch_args is None:
+        return formatted_launch_args
+    for arg in launch_args:
+        arg_name, arg_value = arg.split("=", 1)
+        delimiter = "." if "/" not in arg_name else "/"
+        arg_name = delimiter.join(["+launch", arg_name])
+        formatted_launch_args.append(f"{arg_name}={arg_value}")
+    return formatted_launch_args
+
+
 def _extract_pass_through_args() -> list[str]:
     """Extract passthrough arguments from sys.argv."""
     is_multirun: bool = False
@@ -56,21 +71,20 @@ def _extract_pass_through_args() -> list[str]:
         passthrough: list[str] = sys.argv[1:idx]
         if is_multirun:
             passthrough = ["-m", *passthrough]
-            launch_args = [f"+launch.{arg}" for arg in sys.argv[idx + 1 :]]
-            launch_args = [f"+launch.script={sys.argv[0]}", *launch_args]
-            passthrough += launch_args
+            launch_args = _format_multirun_launch_args(sys.argv[0], sys.argv[idx + 1 :])
+            passthrough.extend(launch_args)
         sys.argv = [sys.argv[0], *sys.argv[idx + 1 :]]
         return passthrough
     if len(sys.argv) > 1:
         passthrough = sys.argv[1:]
         if is_multirun:
             passthrough = ["-m", *passthrough]
-            launch_args = f"+launch.script={sys.argv[0]}"
-            passthrough.append(launch_args)
+            launch_args = _format_multirun_launch_args(sys.argv[0])
+            passthrough.extend(launch_args)
         sys.argv = [sys.argv[0]]
         return passthrough
     if is_multirun:
-        return ["-m", f"+launch.script={sys.argv[0]}"]
+        return ["-m", *_format_multirun_launch_args(sys.argv[0])]
     return []
 
 
