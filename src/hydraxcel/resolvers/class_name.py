@@ -1,7 +1,7 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: HydraXcel
-# Author: Carel van Niekerk
+# Project: Calibrated LLM
+# Author: HydraXcel
 # Year: 2025
 # Group: Dialogue Systems and Machine Learning Group
 # Institution: Heinrich Heine University Düsseldorf
@@ -21,21 +21,35 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""HydraXcel: Configuration-driven deep learning launcher."""
+"""Class name resolver for HydraXcel."""
 
-from hydraxcel import resolvers  # noqa: F401 # Register resolvers
-from hydraxcel.accelerate import launch
-from hydraxcel.logging import LoggingPlatform
-from hydraxcel.run import (
-    get_logger,
-    hydraxcel_main,
-    set_seed,
-)
+from omegaconf import DictConfig, OmegaConf
 
 __all__ = [
-    "LoggingPlatform",
-    "get_logger",
-    "hydraxcel_main",
-    "launch",
-    "set_seed",
+    "class_name_resolver",
 ]
+
+
+def class_name_resolver(config_obj: DictConfig) -> str:
+    """OmegaConf resolver to get the class name from a config object.
+
+    This resolver takes a config object and returns the class name of the object
+    that would be returned by OmegaConf.to_object().
+
+    Args:
+        config_obj: The config object (e.g., cfg.trainer, cfg.model)
+
+    Returns:
+        The class name of the object that would be returned by OmegaConf.to_object()
+
+    Example:
+        # In your config YAML or when using the resolver:
+        # trainer_name: ${get_class_name:${trainer}}
+        # This would return something like "DPOTrainer"
+
+    """
+    # Convert to object to get the class
+    obj = OmegaConf.to_object(config_obj)
+
+    # Return the class name
+    return obj.__class__.__name__
