@@ -23,7 +23,7 @@
 # limitations under the License.
 """Class name resolver for HydraXcel."""
 
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 
 __all__ = [
     "class_name_resolver",
