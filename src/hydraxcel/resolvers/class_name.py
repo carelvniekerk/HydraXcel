@@ -48,8 +48,4 @@ def class_name_resolver(config_obj: DictConfig) -> str:
         # This would return something like "DPOTrainer"
 
     """
-    # Convert to object to get the class
-    obj = OmegaConf.to_object(config_obj)
-
-    # Return the class name
-    return obj.__class__.__name__
+    return config_obj._metadata.object_type.__name__  # noqa: SLF001 # Access metadata to obtain the class name
