@@ -21,21 +21,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""HydraXcel: Configuration-driven deep learning launcher."""
+"""Resolvers for HydraXcel."""
 
-from hydraxcel import resolvers  # noqa: F401 # Register resolvers
-from hydraxcel.accelerate import launch
-from hydraxcel.logging import LoggingPlatform
-from hydraxcel.run import (
-    get_logger,
-    hydraxcel_main,
-    set_seed,
-)
+from omegaconf import OmegaConf
 
-__all__ = [
-    "LoggingPlatform",
-    "get_logger",
-    "hydraxcel_main",
-    "launch",
-    "set_seed",
-]
+from hydraxcel.resolvers.class_name import class_name_resolver
+
+__all__ = []
+
+# Register the resolvers
+OmegaConf.register_new_resolver("get_class_name", class_name_resolver)

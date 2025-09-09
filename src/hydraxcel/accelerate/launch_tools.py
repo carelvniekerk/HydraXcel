@@ -23,6 +23,7 @@
 # limitations under the License.
 """Custom launcher for using accelerate in uv script commands."""
 
+import subprocess
 import sys
 from argparse import Namespace
 from dataclasses import asdict
@@ -42,6 +43,21 @@ _config_store = ConfigStore.instance()
 _config_store.store(name="launch_config", node=LaunchConfig)
 
 
+def _format_multirun_launch_args(
+    script: str,
+    launch_args: list[str] | None = None,
+) -> list[str]:
+    formatted_launch_args: list[str] = [f"+launch.script={script}"]
+    if launch_args is None:
+        return formatted_launch_args
+    for arg in launch_args:
+        arg_name, arg_value = arg.split("=", 1)
+        delimiter = "." if "/" not in arg_name else "/"
+        arg_name = delimiter.join(["+launch", arg_name])
+        formatted_launch_args.append(f"{arg_name}={arg_value}")
+    return formatted_launch_args
+
+
 def _extract_pass_through_args() -> list[str]:
     """Extract passthrough arguments from sys.argv."""
     is_multirun: bool = False
@@ -56,21 +72,22 @@ def _extract_pass_through_args() -> list[str]:
         passthrough: list[str] = sys.argv[1:idx]
         if is_multirun:
             passthrough = ["-m", *passthrough]
-            launch_args = [f"+launch.{arg}" for arg in sys.argv[idx + 1 :]]
-            launch_args = [f"+launch.script={sys.argv[0]}", *launch_args]
-            passthrough += launch_args
-        sys.argv = [sys.argv[0], *sys.argv[idx + 1 :]]
+            launch_args = _format_multirun_launch_args(sys.argv[0], sys.argv[idx + 1 :])
+            passthrough.extend(launch_args)
+        sys.argv = (
+            [sys.argv[0], *sys.argv[idx + 1 :]] if not is_multirun else [sys.argv[0]]
+        )
         return passthrough
     if len(sys.argv) > 1:
         passthrough = sys.argv[1:]
         if is_multirun:
             passthrough = ["-m", *passthrough]
-            launch_args = f"+launch.script={sys.argv[0]}"
-            passthrough.append(launch_args)
+            launch_args = _format_multirun_launch_args(sys.argv[0])
+            passthrough.extend(launch_args)
         sys.argv = [sys.argv[0]]
         return passthrough
     if is_multirun:
-        return ["-m", f"+launch.script={sys.argv[0]}"]
+        return ["-m", *_format_multirun_launch_args(sys.argv[0])]
     return []
 
 
@@ -108,7 +125,7 @@ def launch(
             )
             raise ValueError(msg)
 
-        cfg.training_script = str(script_path)
+        cfg.training_script = script_path.as_posix()
         cfg.training_script_args = passthrough_args
 
         # Flatten and validate the configuration
@@ -125,6 +142,11 @@ def launch(
         cfg = asdict(LaunchConfig(**cfg))
         cfg: Namespace = Namespace(**cfg)
 
+        # If -m is in the passthrough args, run the script directly
+        if "-m" in passthrough_args:
+            cmd = ["uv", "run", script_path.as_posix(), *passthrough_args]
+            subprocess.run(cmd, check=True)  # noqa: S603
+            sys.exit(0)
         launch_command(cfg)
 
     return launch_fn
