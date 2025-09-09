@@ -65,6 +65,7 @@ def hydra_config(
     name: str,
     *,
     defaults: list[str | dict[str, str]] | None = None,
+    properties: list[tuple[str, Any, Any]] | None = None,
     add_training_script_placeholder: bool = False,
 ) -> type:
     """Create a Hydra configuration dataclass."""
@@ -76,6 +77,9 @@ def hydra_config(
             field(default_factory=lambda: defaults),
         ),
     ]
+
+    if properties is not None:
+        values.extend(properties)
 
     if add_training_script_placeholder:
         values.append(("training_script", str, field(default="")))
