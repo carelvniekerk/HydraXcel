@@ -45,7 +45,7 @@ class Configuration(Protocol):
 def register_plugin(
     plugin_name: str,
     config: Configuration,
-    launcher: type[Plugin],
+    plugin_class: type[Plugin],
 ) -> None:
     """Register the plugin."""
     if not config._target_.startswith("hydra_plugins."):
@@ -57,4 +57,4 @@ def register_plugin(
         node=config,
     )
     plugins_manager: Plugins = Plugins.instance()
-    plugins_manager.class_name_to_class[config._target_] = launcher
+    plugins_manager.class_name_to_class[config._target_] = plugin_class
