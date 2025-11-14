@@ -21,18 +21,40 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tools for hydra and configuration management."""
+"""Plugin for Hydra registration."""
+
+from dataclasses import dataclass, field
+from typing import Protocol
 
 from hydra.core.config_store import ConfigStore
+from hydra.core.plugins import Plugin, Plugins
 
-from hydraxcel.hydra.configuration import flatten_config, hydra_config
-from hydraxcel.hydra.registration import register_plugin
+__all__ = ["register_plugin"]
 
-__all__ = [
-    "config_store",
-    "flatten_config",
-    "hydra_config",
-    "register_plugin",
-]
 
-config_store: ConfigStore = ConfigStore.instance()
+@dataclass
+class Configuration(Protocol):
+    """Protocol for hydra configuration."""
+
+    _target_: str = field(
+        default="hydra_plugins.hydra.launcher.basic_launcher.BasicLauncher",
+        metadata={"help": "Target class to instantiate"},
+    )
+
+
+def register_plugin(
+    plugin_name: str,
+    config: Configuration,
+    launcher: type[Plugin],
+) -> None:
+    """Register the plugin."""
+    if not config._target_.startswith("hydra_plugins."):
+        config._target_ = f"hydra_plugins.{config._target_}"
+
+    ConfigStore.instance().store(
+        group="hydra/launcher",
+        name=plugin_name,
+        node=config,
+    )
+    plugins_manager: Plugins = Plugins.instance()
+    plugins_manager.class_name_to_class[config._target_] = launcher
