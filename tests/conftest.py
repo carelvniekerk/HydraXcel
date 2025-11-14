@@ -98,7 +98,7 @@ def logging_platform_init(monkeypatch: pytest.MonkeyPatch) -> dict[str, str]:
         accelerator: Accelerator | None = None,  # noqa: ARG001
     ) -> None:
         calls["project_name"] = f"{project_name}"
-        calls["constant"] = getattr(config, "constant", None)
+        calls["constant"] = getattr(config, "constant", "")
 
     # Patch the symbol imported into hydraxcel.run.setup
     monkeypatch.setattr(
