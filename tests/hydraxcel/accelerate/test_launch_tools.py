@@ -58,7 +58,7 @@ def test_launch_injects_script_and_args_no_delimiter(
     launcher()  # type: ignore[missing-argument]
 
     ensure(
-        Path(captured["training_script"]) == dummy_script,
+        Path(captured["training_script"]) == dummy_script,  # type: ignore[invalid-argument-type]
         "Training script path mismatch",
     )
     ensure(
@@ -97,7 +97,7 @@ def test_launch_injects_script_and_args_with_delimiter(
     launcher()  # type: ignore[missing-argument]
 
     ensure(
-        Path(captured["training_script"]) == dummy_script,
+        Path(captured["training_script"]) == dummy_script,  # type: ignore[invalid-argument-type]
         "Training script path mismatch",
     )
     # Only the args before the '--' delimiter
