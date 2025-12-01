@@ -80,7 +80,7 @@ def initialize_mlflow(  # noqa: PLR0913
 
     cfg_container = OmegaConf.to_container(config, resolve=True)
     if isinstance(cfg_container, dict):
-        flat_params = flatten_dict(cfg_container)
+        flat_params = flatten_dict(cfg_container)  # type: ignore[arg-type]
         # Convert values to strings (MLflow params must be str-able & short)
         safe_params: dict[str, str] = {}
         for key, value in flat_params.items():
