@@ -21,20 +21,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tools for hydra and configuration management."""
+"""Hydra Registry Package."""
 
-from hydra.core.config_store import ConfigStore
+from hydraxcel.hydra.registry.loader import load_methods
+from hydraxcel.hydra.registry.registry import BaseRegistry
 
-from hydraxcel.hydra.configuration import flatten_config, hydra_config
-from hydraxcel.hydra.registration import register_plugin
-from hydraxcel.hydra.registry import BaseRegistry, load_methods
-
-__all__ = [
-    "BaseRegistry",
-    "config_store",
-    "flatten_config",
-    "hydra_config",
-    "register_plugin",
-]
-
-config_store: ConfigStore = ConfigStore.instance()
+__all__ = ["BaseRegistry", "load_methods"]

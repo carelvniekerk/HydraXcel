@@ -21,20 +21,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tools for hydra and configuration management."""
+"""Loader to scan and import all modules for registry registration."""
 
-from hydra.core.config_store import ConfigStore
+import importlib
+import pkgutil
+from typing import MutableSequence
 
-from hydraxcel.hydra.configuration import flatten_config, hydra_config
-from hydraxcel.hydra.registration import register_plugin
-from hydraxcel.hydra.registry import BaseRegistry, load_methods
+__all__: list[str] = ["load_methods"]
 
-__all__ = [
-    "BaseRegistry",
-    "config_store",
-    "flatten_config",
-    "hydra_config",
-    "register_plugin",
-]
 
-config_store: ConfigStore = ConfigStore.instance()
+def load_methods(
+    module_name: str,
+    module_path: MutableSequence[str],
+    excluded_names: list[str] | None = None,
+) -> None:
+    """Import all methods in a module to register them."""
+    if excluded_names is None:
+        excluded_names = []
+    for _, method_name, _ in pkgutil.iter_modules(module_path):
+        if method_name in excluded_names:
+            continue
+        method_module = f"{module_name}.{method_name}"
+        importlib.import_module(method_module)
