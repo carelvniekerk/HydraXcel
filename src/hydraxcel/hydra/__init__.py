@@ -34,6 +34,7 @@ __all__ = [
     "config_store",
     "flatten_config",
     "hydra_config",
+    "load_methods",
     "register_plugin",
 ]
 
