@@ -143,7 +143,7 @@ def launch(
         cfg: Namespace = Namespace(**cfg)
 
         # If -m is in the passthrough args, run the script directly
-        if "-m" in passthrough_args:
+        if "-m" in passthrough_args or "--help" in passthrough_args:
             cmd = ["uv", "run", script_path.as_posix(), *passthrough_args]
             subprocess.run(cmd, check=True)  # noqa: S603
             sys.exit(0)
