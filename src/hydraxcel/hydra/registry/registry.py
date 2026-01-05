@@ -27,7 +27,10 @@ from collections.abc import Callable
 
 from hydra.core.config_store import ConfigStore
 
-type RegistryDecorator[RegistryItemT] = Callable[[type[RegistryItemT]], type[RegistryItemT]]
+type RegistryDecorator[RegistryItemT] = Callable[
+    [type[RegistryItemT]],
+    type[RegistryItemT],
+]
 
 __all__ = ["BaseRegistry"]
 
