@@ -2,7 +2,7 @@
 # --------------------------------------------------------------------------------
 # Project: HydraXcel
 # Author: Carel van Niekerk
-# Year: 2025
+# Year: 2026
 # Group: Dialogue Systems and Machine Learning Group
 # Institution: Heinrich Heine University Düsseldorf
 # --------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ from collections.abc import Callable
 
 from hydra.core.config_store import ConfigStore
 
-type RegistryDecorator[RegistryItemT] = Callable[[RegistryItemT], RegistryItemT]
+type RegistryDecorator[RegistryItemT] = Callable[[type[RegistryItemT]], type[RegistryItemT]]
 
 __all__ = ["BaseRegistry"]
 
@@ -39,7 +39,7 @@ class BaseRegistry[RegistryItemT]:
 
     def __init__(self, group_name: str) -> None:
         """Initialize the registry."""
-        self._registry: dict[str, RegistryItemT] = {}
+        self._registry: dict[str, type[RegistryItemT]] = {}
         self._group_name = group_name
 
     def register(
@@ -49,7 +49,7 @@ class BaseRegistry[RegistryItemT]:
     ) -> RegistryDecorator[RegistryItemT]:
         """Register an item with a given name."""
 
-        def decorator(cls: RegistryItemT) -> RegistryItemT:
+        def decorator(cls: type[RegistryItemT]) -> type[RegistryItemT]:
             self._registry[name] = cls
 
             config_store.store(
