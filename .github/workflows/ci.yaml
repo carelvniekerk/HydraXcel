@@ -1,42 +1,46 @@
 name: UnitTests
 
 on:
-  push:
-    branches: [ master, develop ]
-  pull_request:
-    branches: [ master, develop ]
-  workflow_dispatch:
-
+    push:
+        branches: [main, develop]
+    pull_request:
+        branches: [main, develop]
+    workflow_dispatch:
 
 jobs:
-  test:
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [ '3.13' ]
-    runs-on: ubuntu-latest
+    test:
+        strategy:
+            fail-fast: false
+            matrix:
+                python-version: ["3.12", "3.13", "3.14"]
+        runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-    - name: Set up Python and uv
-      uses: astral-sh/setup-uv@v3
-      with:
-        python-version: ${{ matrix.python-version }}
+            - name: Set up Python and uv
+              uses: astral-sh/setup-uv@v3
+              with:
+                  python-version: ${{ matrix.python-version }}
 
-    # (Optional) Show dependency graph
-    - name: Resolve & sync environment
-      run: |
-        uv python pin ${{ matrix.python-version }}
-        uv sync --all-extras --dev
-        uv tool install ruff
+            # (Optional) Show dependency graph
+            - name: Resolve & sync environment
+              run: |
+                  uv python pin ${{ matrix.python-version }}
+                  uv sync --all-extras --dev
+                  uv tool install ruff ty
 
-    - name: Run linters (optional)
-      if: matrix.python-version == '3.13'
-      run: |
-        uvx ruff check .
+            - name: Run linters (optional)
+              if: matrix.python-version == '3.13'
+              run: |
+                  uvx ruff check .
 
-    - name: Run tests
-      run: |
-        uv run tests
+            - name: Run type checks (optional)
+              if: matrix.python-version == '3.13'
+              run: |
+                  uvx ty check --python=.venv/
+
+            - name: Run tests
+              run: |
+                  uv run tests
