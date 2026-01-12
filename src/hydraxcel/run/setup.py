@@ -191,7 +191,7 @@ def hydraxcel_main(  # noqa: PLR0913
         """Run the main function with the Accelerator."""
         job_name = _setup_hydra_config_and_logging(
             file_path=Path(main_func.__code__.co_filename),  # type: ignore[attr-defined]
-            config_keys=output_dir_keys,  # type: ignore[arg-type] # Ty Bug
+            config_keys=output_dir_keys,
             add_submission_launcher=add_hydra_submission_launcher,
         )
 
@@ -213,7 +213,7 @@ def hydraxcel_main(  # noqa: PLR0913
             accelerator: Accelerator = Accelerator()
             log_accelerator_info(accelerator)
             init_logging_platform(
-                platform=logging_platform,  # type: ignore[invalid-argument-type]
+                platform=logging_platform,
                 config=cfg,
                 project_name=project_name,
                 task_name=job_name,
