@@ -29,7 +29,8 @@ jobs:
               run: |
                   uv python pin ${{ matrix.python-version }}
                   uv sync --all-extras --dev
-                  uv tool install ruff ty
+                  uv tool install ruff
+                  uv tool install ty
 
             - name: Run linters (optional)
               if: matrix.python-version == '3.13'
