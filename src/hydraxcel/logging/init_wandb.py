@@ -92,4 +92,4 @@ def initialize_wandb(
 
     # Add the run config to the wandb config
     # (so that they are tracked in the wandb run)
-    wandb.config.run = cfg_dict  # type: ignore[attr-defined]
+    wandb.config.run = cfg_dict

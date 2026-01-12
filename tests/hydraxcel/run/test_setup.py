@@ -58,7 +58,7 @@ def test_create_run_dir_standard(
     result = _create_run_dir(root_dir=Path("outputs"), config_keys=config_keys)
     ensure(isinstance(result, RunDir), "Result should be RunDir instance")
 
-    path_parts = Path(result.dir).parts  # type: ignore[arg-type]
+    path_parts = Path(result.dir).parts
     ensure(
         path_parts[: len(expected_segments)] == expected_segments,
         f"Prefix mismatch: {path_parts} vs {expected_segments}",
@@ -88,7 +88,7 @@ def test_create_run_dir_sweep(
     )
     ensure(isinstance(result, SweepDir), "Result should be SweepDir instance")
     expected_root = str(Path("multirun") / "${hydra.job.name}")
-    ensure(result.dir == expected_root, "Sweep root dir mismatch")  # type: ignore[attr-defined]
+    ensure(result.dir == expected_root, "Sweep root dir mismatch")
     sub_parts = Path(result.subdir).parts  # type: ignore[arg-type,attr-defined]
     ensure(
         sub_parts[-1] == "${now:%Y-%m-%d_%H-%M-%S}",
@@ -107,7 +107,7 @@ def test_create_run_dir_path_order_is_preserved() -> None:
     """Config key order should be preserved in final path segments."""
     keys = ["alpha", "beta", "gamma"]
     result = _create_run_dir(root_dir=Path("outputs"), config_keys=keys)
-    parts = Path(result.dir).parts  # type: ignore[arg-type]
+    parts = Path(result.dir).parts
     placeholders: Iterable[str] = parts[2:-1]  # skip root + job name + final timestamp
     ensure(
         list(placeholders) == [f"${{{k}}}" for k in keys],
