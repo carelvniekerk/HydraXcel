@@ -1,6 +1,6 @@
 [project]
 name = "hydraxcel"
-version = "0.1.0a"
+version = "0.2.0"
 description = "HydraXcel: Configuration-driven deep learning launcher combining Hydra, Accelerate, and UV for fast, reproducible experiments."
 readme = "README.md"
 authors = [{ name = "Carel van Niekerk", email = "vniekerk.carel@gmail.com" }]
@@ -24,7 +24,7 @@ dev = ["pytest-cov>=6.2.1"]
 tests = "pytest:main"
 
 [build-system]
-requires = ["uv_build>=0.8.8,<0.9.0"]
+requires = ["uv_build>=0.9.26,<0.10.0"]
 build-backend = "uv_build"
 
 # Configuration for Pytest
