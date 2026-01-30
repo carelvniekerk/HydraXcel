@@ -23,13 +23,14 @@
 # limitations under the License.
 """Plugin for Hydra registration."""
 
-from dataclasses import dataclass, field
+from dataclasses import field
 from typing import Protocol
 
 from hydra.core.config_store import ConfigStore
 from hydra.core.plugins import Plugin, Plugins
 
 __all__ = ["register_plugin"]
+
 
 class Configuration(Protocol):
     """Protocol for hydra configuration."""
