@@ -96,7 +96,7 @@ def launch(
     *,
     hydra_configs_dir: str | None = None,
     config_name: str = "accelerate",
-    hydra_base_version: str = "1.3",
+    hydra_base_version: str = "1.4",
 ) -> Callable[[LaunchConfig], None]:
     """Launch a script at a given path."""
     passthrough_args = _extract_pass_through_args()
