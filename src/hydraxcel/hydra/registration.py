@@ -31,8 +31,6 @@ from hydra.core.plugins import Plugin, Plugins
 
 __all__ = ["register_plugin"]
 
-
-@dataclass
 class Configuration(Protocol):
     """Protocol for hydra configuration."""
 
