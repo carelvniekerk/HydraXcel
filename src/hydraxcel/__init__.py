@@ -2,13 +2,13 @@
 # --------------------------------------------------------------------------------
 # Project: HydraXcel
 # Author: Carel van Niekerk
-# Year: 2025
+# Year: 2026
 # Group: Dialogue Systems and Machine Learning Group
 # Institution: Heinrich Heine University Düsseldorf
 # --------------------------------------------------------------------------------
 #
 # This code was generated with the help of AI writing assistants
-# including GitHub Copilot, ChatGPT, Bing Chat.
+# including GitHub Copilot, ChatGPT Codex, Claude Code, Gemini.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 """HydraXcel: Configuration-driven deep learning launcher."""
 
 from hydraxcel import resolvers  # noqa: F401 # Register resolvers
-from hydraxcel.accelerate import launch
+from hydraxcel.accelerate import launch, load_accelerate_configs
 from hydraxcel.logging import LoggingPlatform
 from hydraxcel.run import (
     get_logger,
@@ -37,5 +37,6 @@ __all__ = [
     "get_logger",
     "hydraxcel_main",
     "launch",
+    "load_accelerate_configs",
     "set_seed",
 ]

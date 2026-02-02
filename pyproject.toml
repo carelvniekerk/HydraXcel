@@ -12,6 +12,7 @@ dependencies = [
     "mlflow>=3.2.0",
     "transformers>=4.55.0",
     "wandb>=0.21.1",
+    "weave>=0.52.17",
 ]
 
 [tool.uv.sources]

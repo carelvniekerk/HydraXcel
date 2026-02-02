@@ -8,7 +8,7 @@
 # --------------------------------------------------------------------------------
 #
 # This code was generated with the help of AI writing assistants
-# including GitHub Copilot, ChatGPT, Bing Chat.
+# including GitHub Copilot, ChatGPT Codex, Claude Code, Gemini.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
