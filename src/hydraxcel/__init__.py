@@ -24,7 +24,7 @@
 """HydraXcel: Configuration-driven deep learning launcher."""
 
 from hydraxcel import resolvers  # noqa: F401 # Register resolvers
-from hydraxcel.accelerate import launch
+from hydraxcel.accelerate import launch, load_accelerate_configs
 from hydraxcel.logging import LoggingPlatform
 from hydraxcel.run import (
     get_logger,
@@ -37,5 +37,6 @@ __all__ = [
     "get_logger",
     "hydraxcel_main",
     "launch",
+    "load_accelerate_configs",
     "set_seed",
 ]

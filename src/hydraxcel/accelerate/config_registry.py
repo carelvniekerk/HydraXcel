@@ -21,11 +21,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Accelerate Configuration."""
+"""Accelerate Configuration Registry."""
 
 from dataclasses import dataclass, field
 
 from hydraxcel.hydra import config_store, hydra_config
+
+__all__ = ["load_accelerate_configs"]
 
 
 @dataclass
@@ -146,78 +148,80 @@ AccelerateConfig = hydra_config(
 )
 
 
-config_store.store(
-    name="accelerate",
-    node=AccelerateConfig,
-)
-config_store.store(
-    name="cpu",
-    group="accelerate/hardware",
-    node=HardwareConfig(cpu=True),
-)
-config_store.store(
-    name="gpu",
-    group="accelerate/hardware",
-    node=HardwareConfig(),
-)
-config_store.store(
-    name="multi-gpu",
-    group="accelerate/hardware",
-    node=HardwareConfig(multi_gpu=True, num_processes=2),
-)
-config_store.store(
-    name="none",
-    group="accelerate/compile",
-    node=CompileConfig(),
-)
-config_store.store(
-    name="inductor",
-    group="accelerate/compile",
-    node=CompileConfig(dynamo_backend="inductor"),
-)
-config_store.store(
-    name="torch-ddp",
-    group="accelerate/paradigm",
-    node=ParadigmConfig(),
-)
-config_store.store(
-    name="deepspeed",
-    group="accelerate/paradigm",
-    node=DeepSpeedConfig(),
-)
-config_store.store(
-    name="deepspeed-zero3",
-    group="accelerate/paradigm",
-    node=DeepSpeedConfig(
-        zero_stage=3,
-        offload_optimizer_device="cpu",
-        offload_param_device="cpu",
-        zero3_init_flag=True,
-        zero3_save_16bit_model=True,
-    ),
-)
-config_store.store(
-    name="torch-fsdp",
-    group="accelerate/paradigm",
-    node=TorchFSDPConfig(),
-)
-config_store.store(
-    name="no",
-    group="accelerate/mixed-precision",
-    node=MixedPrecisionConfig(),
-)
-config_store.store(
-    name="fp16",
-    group="accelerate/mixed-precision",
-    node=MixedPrecisionConfig(mixed_precision="fp16"),
-)
-config_store.store(
-    name="bf16",
-    group="accelerate/mixed-precision",
-    node=MixedPrecisionConfig(mixed_precision="bf16"),
-)
-config_store.store(
-    name="fp8",
-    group="accelerate/mixed-precision",
-    node=FP8PrecisionConfig(),
-)
+def load_accelerate_configs() -> None:
+    """Load accelerate configurations into the config store."""
+    config_store.store(
+        name="accelerate",
+        node=AccelerateConfig,
+    )
+    config_store.store(
+        name="cpu",
+        group="accelerate/hardware",
+        node=HardwareConfig(cpu=True),
+    )
+    config_store.store(
+        name="gpu",
+        group="accelerate/hardware",
+        node=HardwareConfig(),
+    )
+    config_store.store(
+        name="multi-gpu",
+        group="accelerate/hardware",
+        node=HardwareConfig(multi_gpu=True, num_processes=2),
+    )
+    config_store.store(
+        name="none",
+        group="accelerate/compile",
+        node=CompileConfig(),
+    )
+    config_store.store(
+        name="inductor",
+        group="accelerate/compile",
+        node=CompileConfig(dynamo_backend="inductor"),
+    )
+    config_store.store(
+        name="torch-ddp",
+        group="accelerate/paradigm",
+        node=ParadigmConfig(),
+    )
+    config_store.store(
+        name="deepspeed",
+        group="accelerate/paradigm",
+        node=DeepSpeedConfig(),
+    )
+    config_store.store(
+        name="deepspeed-zero3",
+        group="accelerate/paradigm",
+        node=DeepSpeedConfig(
+            zero_stage=3,
+            offload_optimizer_device="cpu",
+            offload_param_device="cpu",
+            zero3_init_flag=True,
+            zero3_save_16bit_model=True,
+        ),
+    )
+    config_store.store(
+        name="torch-fsdp",
+        group="accelerate/paradigm",
+        node=TorchFSDPConfig(),
+    )
+    config_store.store(
+        name="no",
+        group="accelerate/mixed-precision",
+        node=MixedPrecisionConfig(),
+    )
+    config_store.store(
+        name="fp16",
+        group="accelerate/mixed-precision",
+        node=MixedPrecisionConfig(mixed_precision="fp16"),
+    )
+    config_store.store(
+        name="bf16",
+        group="accelerate/mixed-precision",
+        node=MixedPrecisionConfig(mixed_precision="bf16"),
+    )
+    config_store.store(
+        name="fp8",
+        group="accelerate/mixed-precision",
+        node=FP8PrecisionConfig(),
+    )
