@@ -26,4 +26,4 @@
 from hydraxcel.accelerate.config_registry import load_accelerate_configs
 from hydraxcel.accelerate.launch_tools import launch
 
-__all__ = ["launch"]
+__all__ = ["launch", "load_accelerate_configs"]
