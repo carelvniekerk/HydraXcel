@@ -28,6 +28,7 @@ import os
 from pathlib import Path
 
 import wandb
+import weave  # noqa: F401 # Used by WANDB integration
 from accelerate import Accelerator
 from accelerate.tracking import WandBTracker
 from omegaconf import DictConfig, OmegaConf
