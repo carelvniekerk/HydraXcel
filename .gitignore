@@ -24,3 +24,4 @@ mlflow_logs
 
 # Ruff Cache
 .ruff_cache
+.uvgroups
