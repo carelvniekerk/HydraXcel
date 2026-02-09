@@ -33,6 +33,7 @@
         "rdzv",
         "relogin",
         "reshard",
-        "Ruppik"
-    ],
+        "Ruppik",
+        "setuptools"
+    ]
 }
