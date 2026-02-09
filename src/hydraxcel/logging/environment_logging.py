@@ -107,7 +107,7 @@ def _log_python_env_info(logger: logging.Logger) -> None:
         logger.info(f"\tPython:\t\t{python_version}")  # noqa: G004
         logger.info(f"\tImplementation:\t{implementation}")  # noqa: G004
         logger.info(
-            f"\tPath:\t\t{venv_path if venv_path else 'Not in a virtual environment'}",  # noqa: G004
+            f"\tPath:\t\t{venv_path or 'Not in a virtual environment'}",  # noqa: G004
         )
         logger.info(f"\tExecutable:\t{executable}")  # noqa: G004
         logger.info(f"\tValid:\t\t{valid_venv}")  # noqa: G004
