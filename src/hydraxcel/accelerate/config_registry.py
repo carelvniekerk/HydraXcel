@@ -140,7 +140,7 @@ AccelerateConfig = hydra_config(
     "AccelerateConfig",
     defaults=[
         {"accelerate/hardware": "gpu"},
-        {"accelerate/compile": "none"},
+        {"accelerate/compile": "torch"},
         {"accelerate/paradigm": "torch-ddp"},
         {"accelerate/mixed-precision": "bf16"},
     ],
@@ -173,6 +173,15 @@ def load_accelerate_configs() -> None:
         name="none",
         group="accelerate/compile",
         node=CompileConfig(),
+    )
+    config_store.store(
+        name="torch",
+        group="accelerate/compile",
+        node=CompileConfig(
+            dynamo_backend="inductor",
+            dynamo_mode="default",
+            dynamo_use_dynamic=True,
+        ),
     )
     config_store.store(
         name="inductor",
