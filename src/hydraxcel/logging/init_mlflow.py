@@ -74,9 +74,9 @@ def initialize_mlflow(  # noqa: PLR0913
     mlflow.set_tracking_uri(tracking_dir.as_uri())
     mlflow.set_experiment(experiment_name)
 
-    active_run: mlflow.ActiveRun | None = mlflow.active_run()  # type: ignore[possibly-unbound-attr] # Ty Bug
+    active_run: mlflow.ActiveRun | None = mlflow.active_run()
     if active_run is None or nested:
-        mlflow.start_run(run_name=run_name, nested=nested)  # type: ignore[possibly-unbound-attr] # Ty Bug
+        mlflow.start_run(run_name=run_name, nested=nested)
 
     cfg_container = OmegaConf.to_container(config, resolve=True)
     if isinstance(cfg_container, dict):
@@ -92,10 +92,10 @@ def initialize_mlflow(  # noqa: PLR0913
             except TypeError:
                 continue
         # Chunk if too many params (MLflow can handle many, but keep reasonable)
-        mlflow.log_params(safe_params)  # type: ignore[possibly-unbound-attr] # Ty Bug
+        mlflow.log_params(safe_params)
 
         # Also log full config as an artifact (YAML)
         yaml_txt = OmegaConf.to_yaml(config)
-        mlflow.log_text(yaml_txt, artifact_file="config.yaml")  # type: ignore[possibly-unbound-attr] # Ty Bug
+        mlflow.log_text(yaml_txt, artifact_file="config.yaml")
     else:
-        mlflow.log_text(str(cfg_container), artifact_file="config_repr.txt")  # type: ignore[possibly-unbound-attr] # Ty Bug
+        mlflow.log_text(str(cfg_container), artifact_file="config_repr.txt")
