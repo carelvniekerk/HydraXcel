@@ -35,7 +35,7 @@ repos:
           - id: bandit
             exclude: ^tests/
 
-    # Run pytest tests with uv (to be fixed)
+    # Run pytest tests with uv
     - repo: local
       hooks:
           - id: pytest
