@@ -36,14 +36,14 @@ repos:
             exclude: ^tests/
 
     # Run pytest tests with uv (to be fixed)
-    # - repo: local
-    #   hooks:
-    #       - id: pytest
-    #         name: pytest
-    #         entry: uv run tests
-    #         language: system
-    #         pass_filenames: false
-    #         always_run: true
+    - repo: local
+      hooks:
+          - id: pytest
+            name: pytest
+            entry: uv run tests
+            language: system
+            pass_filenames: false
+            always_run: true
 
     # Run ty type checks with uv
     - repo: local
