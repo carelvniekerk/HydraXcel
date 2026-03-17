@@ -26,7 +26,6 @@
 import logging
 from pathlib import Path
 
-import mlflow
 from accelerate import Accelerator
 from accelerate.tracking import MLflowTracker
 from omegaconf import DictConfig, OmegaConf
@@ -61,6 +60,14 @@ def initialize_mlflow(  # noqa: PLR0913
         The active MLflow run.
 
     """
+    try:
+        import mlflow  # noqa: PLC0415  # ty:ignore[unresolved-import]
+    except ImportError as err:
+        msg = (
+            "MLflow is not installed. Please install it with `uv add mlflow` to "
+            "use MLflow tracking."
+        )
+        raise ImportError(msg) from err
     logger = logging.getLogger("mlflow")
     logger.handlers.clear()
     logger.propagate = True

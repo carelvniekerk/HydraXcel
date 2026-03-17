@@ -30,9 +30,6 @@ from pathlib import Path
 
 from hydra import main
 from hydra.core.config_store import ConfigStore
-from mlflow.server import _run_server
-from mlflow.server.handlers import initialize_backend_stores
-from mlflow.utils.process import ShellCommandException
 
 logger = getLogger("mlflow")
 
@@ -56,6 +53,23 @@ ConfigStore.instance().store(
 @main(config_path=None, config_name="server_config", version_base="1.3")
 def run_mlflow_server(cfg: ServerConfig) -> None:
     """Run the MLFlow server."""
+    try:
+        from mlflow.server import (  # noqa: PLC0415  # ty:ignore[unresolved-import]
+            _run_server,
+        )
+        from mlflow.server.handlers import (  # noqa: PLC0415  # ty:ignore[unresolved-import]
+            initialize_backend_stores,
+        )
+        from mlflow.utils.process import (  # noqa: PLC0415  # ty:ignore[unresolved-import]
+            ShellCommandException,
+        )
+    except ImportError as err:
+        msg = (
+            "MLflow is not installed. Please install it with `uv add mlflow` to "
+            "run the MLflow server."
+        )
+        raise ImportError(msg) from err
+
     try:
         initialize_backend_stores(
             backend_store_uri=cfg.backend_store_uri.as_posix(),
