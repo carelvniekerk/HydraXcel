@@ -41,10 +41,10 @@ def flatten_config(
 ) -> dict[str, Any]:
     """Flatten nested configurations for hydra."""
     if isinstance(configuration, DictConfig):
-        configuration: dict[str, Any] = OmegaConf.to_container(  # type: ignore[assignment]
+        configuration: dict[str, Any] = OmegaConf.to_container(
             configuration,
             resolve=True,
-        )
+        )  # ty:ignore[invalid-assignment]
     items: dict[str, Any] = {}
     if max_depth is not None and max_depth < 0:
         return items

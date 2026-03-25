@@ -26,14 +26,15 @@
 import os
 import sys
 from pathlib import Path
-from typing import Callable, Generator
+from typing import TYPE_CHECKING, Callable, Generator
 
 import pytest
 from accelerate import Accelerator
 from hydra.core.global_hydra import GlobalHydra
 from omegaconf import DictConfig
 
-from hydraxcel.accelerate.config import LaunchConfig
+if TYPE_CHECKING:
+    from hydraxcel.accelerate.config import LaunchConfig
 
 CONSTANT: int = 42
 
@@ -153,7 +154,7 @@ def make_user_main(
 
         return _user_main
 
-    return _make  # type: ignore[invalid-return-type] # Remove once Todo in Ty is solved
+    return _make  # ty:ignore[invalid-return-type]
 
 
 @pytest.fixture
@@ -193,7 +194,7 @@ def patch_launch_command(
             raising=True,
         )
 
-    return _patch  # type: ignore[invalid-return-type] # Remove once Todo in Ty is solved
+    return _patch  # ty:ignore[invalid-return-type]
 
 
 @pytest.fixture

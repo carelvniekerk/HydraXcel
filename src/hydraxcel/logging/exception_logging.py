@@ -106,4 +106,4 @@ def setup_exception_logging(
         logger.warning(f"{category.__name__} at {filename}:{lineno}: {message}")  # noqa: G004
 
     sys.excepthook = handle_exception
-    warnings.showwarning = handle_warning  # type: ignore[assignment]
+    warnings.showwarning = handle_warning  # ty:ignore[invalid-assignment]

@@ -36,7 +36,7 @@ from hydraxcel.logging.init_mlflow import initialize_mlflow
 from hydraxcel.logging.init_wandb import initialize_wandb
 
 try:
-    from deepspeed.utils import (  # type: ignore[unresolved-import]
+    from deepspeed.utils import (  # ty:ignore[unresolved-import]
         logger as deepspeed_logger,
     )
 
@@ -70,7 +70,7 @@ def get_logger(
 
     if setup_transformers_logger:
         # Get the transformer logger and propagate its logs to the Hydra root.
-        transformers_logger: logging.Logger = transformers.utils.logging.get_logger()  # type: ignore[unresolved-attribute] # TODO: Remove when ty bug is fixed
+        transformers_logger: logging.Logger = transformers.utils.logging.get_logger()  # ty:ignore[possibly-missing-submodule]
         transformers_logger.handlers.clear()
         transformers_logger.propagate = True
 

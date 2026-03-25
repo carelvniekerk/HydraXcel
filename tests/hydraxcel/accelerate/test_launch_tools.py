@@ -49,16 +49,16 @@ def test_launch_injects_script_and_args_no_delimiter(
     monkeypatch.setattr(sys, "argv", ["prog", "--foo", "bar", "123"])
 
     captured: dict[str, str | list[str]] = {}
-    patch_launch_command(record=captured)  # type: ignore[missing-argument]
+    patch_launch_command(record=captured)  # ty:ignore[missing-argument, unknown-argument]
 
     launcher = launch(
         script_path=dummy_script,
         hydra_configs_dir=str(accelerate_config_dir),
     )
-    launcher()  # type: ignore[missing-argument]
+    launcher()  # ty:ignore[missing-argument]
 
     ensure(
-        Path(captured["training_script"]) == dummy_script,  # type: ignore[invalid-argument-type]
+        Path(captured["training_script"]) == dummy_script,  # ty:ignore[invalid-argument-type]
         "Training script path mismatch",
     )
     ensure(
@@ -88,16 +88,16 @@ def test_launch_injects_script_and_args_with_delimiter(
     )
 
     captured: dict[str, str | list[str]] = {}
-    patch_launch_command(record=captured)  # type: ignore[missing-argument]
+    patch_launch_command(record=captured)  # ty:ignore[missing-argument, unknown-argument]
 
     launcher = launch(
         script_path=dummy_script,
         hydra_configs_dir=str(accelerate_config_dir),
     )
-    launcher()  # type: ignore[missing-argument]
+    launcher()  # ty:ignore[missing-argument]
 
     ensure(
-        Path(captured["training_script"]) == dummy_script,  # type: ignore[invalid-argument-type]
+        Path(captured["training_script"]) == dummy_script,  # ty:ignore[invalid-argument-type]
         "Training script path mismatch",
     )
     # Only the args before the '--' delimiter

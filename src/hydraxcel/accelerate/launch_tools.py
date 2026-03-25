@@ -129,7 +129,7 @@ def launch(
         cfg.training_script_args = passthrough_args
 
         # Flatten and validate the configuration
-        cfg: dict = flatten_config(cfg)  # type: ignore[invalid-argument-type]
+        cfg: dict = flatten_config(cfg)  # ty:ignore[invalid-argument-type]
         for key in [
             "deepspeed_fields_from_accelerate_config",
             "use_cpu",

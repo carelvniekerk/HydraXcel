@@ -4,7 +4,7 @@ version = "0.2.0"
 description = "HydraXcel: Configuration-driven deep learning launcher combining Hydra, Accelerate, and UV for fast, reproducible experiments."
 readme = "README.md"
 authors = [{ name = "Carel van Niekerk", email = "vniekerk.carel@gmail.com" }]
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
     "accelerate>=1.10.0",
     "colorlog>=6.9.0",
@@ -27,7 +27,7 @@ dev = ["pytest-cov>=6.2.1"]
 tests = "pytest:main"
 
 [build-system]
-requires = ["uv_build>=0.10.10,<0.11.0"]
+requires = ["uv_build>=0.11.1,<0.12"]
 build-backend = "uv_build"
 
 # Configuration for Pytest
@@ -36,7 +36,7 @@ addopts = "--cov src/hydraxcel --verbose --cov-report=term-missing"
 
 # Configuration for Ruff (Python linter and formatter)
 [tool.ruff]
-target-version = "py313"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = ["ALL"]

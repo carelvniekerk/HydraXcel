@@ -63,7 +63,7 @@ def create_logging_config(
         },
     }
 
-    handlers: dict[str, dict[str, str]] = {  # type: ignore[invalid-assignment] #TODO: Remove after ty bug fix
+    handlers: dict[str, dict[str, str | list[str]]] = {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "colored" if colorlog_console else "simple",

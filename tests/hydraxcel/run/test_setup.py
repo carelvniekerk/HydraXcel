@@ -89,7 +89,7 @@ def test_create_run_dir_sweep(
     ensure(isinstance(result, SweepDir), "Result should be SweepDir instance")
     expected_root = str(Path("multirun") / "${hydra.job.name}")
     ensure(result.dir == expected_root, "Sweep root dir mismatch")
-    sub_parts = Path(result.subdir).parts  # type: ignore[arg-type,attr-defined]
+    sub_parts = Path(result.subdir).parts  # ty:ignore[unresolved-attribute]
     ensure(
         sub_parts[-1] == "${now:%Y-%m-%d_%H-%M-%S}",
         "Sweep subdir missing timestamp placeholder",
@@ -129,7 +129,7 @@ def test_hydraxcel_main_wandb(  # noqa: PLR0913
 ) -> None:
     """Test hydraxcel_main wrapper with W&B integration."""
     received: dict[str, str] = {}
-    user_main = make_user_main(record=received)  # type: ignore[missing-argument]
+    user_main = make_user_main(record=received)  # ty:ignore[missing-argument, unknown-argument]
 
     wrapped = hydraxcel_main(
         project_name="demo",
@@ -167,7 +167,7 @@ def test_hydraxcel_main_debug_skips_wandb(
 ) -> None:
     """Test hydraxcel_main wrapper with W&B integration."""
     received: dict[str, str] = {}
-    user_main = make_user_main(record=received)  # type: ignore[missing-argument]
+    user_main = make_user_main(record=received)  # ty:ignore[missing-argument, unknown-argument]
 
     wrapped = hydraxcel_main(
         project_name="demo",
@@ -194,7 +194,7 @@ def test_multiple_invocations_clean_state(  # noqa: PLR0913
     disable_debug: None,  # noqa: ARG001
 ) -> None:
     """Test that multiple invocations of the wrapped function do not interfere."""
-    user_main = make_user_main()  # type: ignore[missing-argument]
+    user_main = make_user_main()  # ty:ignore[missing-argument]
 
     wrapped = hydraxcel_main(
         project_name="demo",

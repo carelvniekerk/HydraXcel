@@ -70,7 +70,7 @@ def _create_run_dir(
         )
         for key in config_keys[1:]:
             _key = "${" + key + "}"
-            sub_dir = sub_dir / _key  # type: ignore[operator]
+            sub_dir = sub_dir / _key  # ty:ignore[unsupported-operator]
 
         sub_dir = (
             sub_dir / "${now:%Y-%m-%d_%H-%M-%S}"
@@ -106,15 +106,15 @@ def _setup_hydra_config_and_logging(
     job_config: JobConf = JobConf(name=job_name, chdir=change_to_output_dir)
     logging_config: dict = create_logging_config()
 
-    run_dir: RunDir = _create_run_dir(  # type: ignore[assignment]
+    run_dir: RunDir = _create_run_dir(
         root_dir=Path("outputs"),
         config_keys=config_keys,
-    )
-    sweep_dir: SweepDir = _create_run_dir(  # type: ignore[assignment]
+    )  # ty:ignore[invalid-assignment]
+    sweep_dir: SweepDir = _create_run_dir(
         root_dir=Path("multirun"),
         config_keys=config_keys,
         is_sweep=True,
-    )
+    )  # ty:ignore[invalid-assignment]
 
     if add_submission_launcher:
         hydra_defaults: list[str | dict[str, str | None]] = [
@@ -190,7 +190,7 @@ def hydraxcel_main(  # noqa: PLR0913
     def outer(main_func: Callable[..., None]) -> Callable[..., None]:
         """Run the main function with the Accelerator."""
         job_name = _setup_hydra_config_and_logging(
-            file_path=Path(main_func.__code__.co_filename),  # type: ignore[attr-defined]
+            file_path=Path(main_func.__code__.co_filename),  # ty:ignore[unresolved-attribute]
             config_keys=output_dir_keys,
             add_submission_launcher=add_hydra_submission_launcher,
         )

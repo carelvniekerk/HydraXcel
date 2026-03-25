@@ -24,10 +24,12 @@
 """Logging helper functions for HydraXcel."""
 
 import logging
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from accelerate import Accelerator
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 __all__ = [
     "MainProcessFilter",
@@ -109,5 +111,9 @@ class MainProcessFilter(logging.Filter):
         """Pass records only on main (rank 0) process."""
         try:
             return self._is_main_process
-        except (RuntimeError, ValueError):
+        except (RuntimeError, ValueError) as err:
+            logging.getLogger(__name__).warning(
+                "Error occurred while checking main process: %s",
+                err,
+            )
             return False

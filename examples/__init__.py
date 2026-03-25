@@ -38,4 +38,4 @@ launch_hello = launch(
 
 # Only for demonstration purposes, should be run as a module using uv as documented.
 if __name__ == "__main__":
-    launch_hello()  # type: ignore[missing-argument]
+    launch_hello()  # ty:ignore[missing-argument]

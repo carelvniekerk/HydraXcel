@@ -64,9 +64,20 @@ class BaseRegistry[RegistryItemT]:
 
         return decorator
 
-    def get(self, name: str) -> RegistryItemT:
-        """Retrieve an item by its name."""
+    def get(self, name: str) -> type[RegistryItemT]:
+        """Retrieve an item by its name.
+
+        Args:
+            name (str): The name of the item to retrieve.
+
+        Returns:
+            The item associated with the given name.
+
+        Raises:
+            KeyError: If the name is not found in the registry.
+
+        """
         if name not in self._registry:
             msg = f"Item '{name}' not found in registry group '{self._group_name}'."
             raise KeyError(msg)
-        return self._registry.get(name)  # type: ignore[invalid-return-type]
+        return self._registry[name]
