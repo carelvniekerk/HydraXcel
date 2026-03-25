@@ -26,15 +26,14 @@
 import os
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Generator
+from typing import Callable, Generator
 
 import pytest
 from accelerate import Accelerator
 from hydra.core.global_hydra import GlobalHydra
 from omegaconf import DictConfig
 
-if TYPE_CHECKING:
-    from hydraxcel.accelerate.config import LaunchConfig
+from hydraxcel.accelerate.config import LaunchConfig  # noqa: TC001
 
 CONSTANT: int = 42
 

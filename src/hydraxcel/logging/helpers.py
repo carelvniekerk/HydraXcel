@@ -24,12 +24,10 @@
 """Logging helper functions for HydraXcel."""
 
 import logging
-from typing import TYPE_CHECKING, Any
+from pathlib import Path  # noqa: TC003
+from typing import Any
 
 from accelerate import Accelerator
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 __all__ = [
     "MainProcessFilter",
