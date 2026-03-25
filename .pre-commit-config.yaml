@@ -50,8 +50,7 @@ repos:
       hooks:
           - id: ty-check
             name: ty-check
-            language: python
-            entry: ty check
+            language: system
+            entry: uvx ty check
             pass_filenames: false
-            args: [--python=.venv/]
-            additional_dependencies: [ty]
+            types: [python]
