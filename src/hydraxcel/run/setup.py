@@ -154,6 +154,19 @@ def _setup_hydra_config_and_logging(
     return job_name
 
 
+def _get_cfg_attr(cfg: DictConfig, attr: str) -> str | float | bool:
+    if "." in attr:
+        main_key, sub_key = attr.split(".", 1)
+        return _get_cfg_attr(getattr(cfg, main_key), sub_key)
+    return getattr(cfg, attr)
+
+
+def get_job_name(cfg: DictConfig, keys: list[str]) -> str:
+    """Get the job name from the configuration."""
+    key_values = [_get_cfg_attr(cfg, key) for key in keys]
+    return "_".join(str(value) for value in key_values)
+
+
 def set_seed(seed: int) -> None:
     """Set the seed for reproducibility."""
     torch.manual_seed(seed)
@@ -170,6 +183,7 @@ def hydraxcel_main(  # noqa: PLR0913
     hydra_configs_dir: str | None = None,
     hydra_base_version: str = "1.3",
     logging_platform: LoggingPlatform | str = LoggingPlatform.WANDB,
+    job_name_keys: list[str] | None = None,
     add_hydra_submission_launcher: bool = False,
 ) -> Callable[Callable[..., None], Callable[..., None]]:
     """Wrap a main function to run with the Accelerator and configure it using Hydra."""
@@ -189,7 +203,7 @@ def hydraxcel_main(  # noqa: PLR0913
 
     def outer(main_func: Callable[..., None]) -> Callable[..., None]:
         """Run the main function with the Accelerator."""
-        job_name = _setup_hydra_config_and_logging(
+        task_name = _setup_hydra_config_and_logging(
             file_path=Path(main_func.__code__.co_filename),  # ty:ignore[unresolved-attribute]
             config_keys=output_dir_keys,
             add_submission_launcher=add_hydra_submission_launcher,
@@ -199,24 +213,33 @@ def hydraxcel_main(  # noqa: PLR0913
             hydra_store = ConfigStore.instance().store
             hydra_store(
                 node=config_class,
-                name=job_name,
+                name=task_name,
             )
 
         @wraps(main_func)
         @main(
             version_base=hydra_base_version,
             config_path=hydra_configs_dir,
-            config_name=job_name,
+            config_name=task_name,
         )
         def acc_main_func(cfg: DictConfig) -> None:
             log_system_info()
             accelerator: Accelerator = Accelerator()
             log_accelerator_info(accelerator)
+            job_name: str | None = (
+                get_job_name(
+                    cfg=cfg,
+                    keys=job_name_keys,
+                )
+                if job_name_keys
+                else None
+            )
             init_logging_platform(
                 platform=logging_platform,
                 config=cfg,
                 project_name=project_name,
-                task_name=job_name,
+                task_name=task_name,
+                job_name=job_name,
                 accelerator=accelerator,
             )
             try:

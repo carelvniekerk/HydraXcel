@@ -96,6 +96,7 @@ def logging_platform_init(monkeypatch: pytest.MonkeyPatch) -> dict[str, str]:
         config: DictConfig,
         project_name: str,
         accelerator: Accelerator | None = None,  # noqa: ARG001
+        job_name: str | None = None,  # noqa: ARG001
     ) -> None:
         calls["project_name"] = f"{project_name}"
         calls["constant"] = getattr(config, "constant", "")

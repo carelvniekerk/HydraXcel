@@ -81,11 +81,12 @@ def get_logger(
     return logger
 
 
-def init_logging_platform(
+def init_logging_platform(  # noqa: PLR0913
     platform: LoggingPlatform,
     config: DictConfig,
     project_name: str,
     task_name: str,
+    job_name: str | None = None,
     accelerator: Accelerator | None = None,
 ) -> None:
     """Initialize the logging platform."""
@@ -111,6 +112,7 @@ def init_logging_platform(
             config=config,
             project_name=project_name,
             accelerator=accelerator,
+            job_name=job_name,
         )
     elif platform == LoggingPlatform.MLFLOW:
         initialize_mlflow(

@@ -43,6 +43,7 @@ def initialize_wandb(
     config: DictConfig | None = None,
     project_name: str = "ConfidentLLM",
     accelerator: Accelerator | None = None,
+    job_name: str | None = None,
 ) -> None:
     """Initialize wandb."""
     os.environ["WANDB_SILENT"] = "true"
@@ -50,6 +51,7 @@ def initialize_wandb(
     wandb_path = find_project_root(Path(__file__)) / "wandb_logs"
     wandb_run: wandb.Run = wandb.init(
         project=project_name,
+        name=job_name,
         dir=wandb_path.as_posix(),
         settings=wandb.Settings(
             start_method="thread",  # Note: https://docs.wandb.ai/guides/integrations/hydra#troubleshooting-multiprocessing
