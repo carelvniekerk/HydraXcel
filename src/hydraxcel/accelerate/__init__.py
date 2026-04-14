@@ -3,8 +3,6 @@
 # Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2026
-# Group: Dialogue Systems and Machine Learning Group
-# Institution: Heinrich Heine University Düsseldorf
 # --------------------------------------------------------------------------------
 #
 # This code was generated with the help of AI writing assistants
@@ -14,14 +12,19 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http: //www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Launch scripts via accelerate."""
+"""Accelerate launcher package for HydraXcel.
+
+Exposes ``launch`` for wrapping training scripts with Accelerate, and
+``load_accelerate_configs`` for registering hardware/precision/paradigm config
+groups into the Hydra config store.
+"""
 
 from hydraxcel.accelerate.config_registry import load_accelerate_configs
 from hydraxcel.accelerate.launch_tools import launch

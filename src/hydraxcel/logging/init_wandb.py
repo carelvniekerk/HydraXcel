@@ -3,8 +3,6 @@
 # Project: HydraXcel
 # Author: Carel van Niekerk, Benjamin Ruppik
 # Year: 2026
-# Group: Dialogue Systems and Machine Learning Group
-# Institution: Heinrich Heine University Düsseldorf
 # --------------------------------------------------------------------------------
 #
 # This code was generated with the help of AI writing assistants
@@ -45,7 +43,23 @@ def initialize_wandb(
     accelerator: Accelerator | None = None,
     job_name: str | None = None,
 ) -> None:
-    """Initialize wandb."""
+    """Initialise a W&B run and attach it to the Accelerate tracker.
+
+    Creates a new ``wandb.Run`` in *project_name*, optionally names it with
+    *job_name*, stores run artefacts under ``<project_root>/wandb_logs``, and
+    registers a ``WandBTracker`` on the ``Accelerator`` so Accelerate's
+    ``log()`` / ``end_training()`` methods interact with the run.  When
+    *config* is provided its resolved contents are uploaded as the run config.
+
+    Args:
+        config: Optional Hydra/OmegaConf configuration to log as the W&B run
+            config.
+        project_name: W&B project name.
+        accelerator: Optional Accelerate ``Accelerator`` instance; when
+            supplied, the W&B run is attached as an Accelerate tracker.
+        job_name: Display name for the W&B run (maps to ``wandb.init(name=)``).
+
+    """
     os.environ["WANDB_SILENT"] = "true"
 
     wandb_path = find_project_root(Path(__file__)) / "wandb_logs"

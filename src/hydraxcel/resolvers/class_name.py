@@ -1,10 +1,8 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------
-# Project: Calibrated LLM
-# Author: HydraXcel
+# Project: HydraXcel
+# Author: Carel van Niekerk
 # Year: 2026
-# Group: Dialogue Systems and Machine Learning Group
-# Institution: Heinrich Heine University Düsseldorf
 # --------------------------------------------------------------------------------
 #
 # This code was generated with the help of AI writing assistants
@@ -14,7 +12,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http: //www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,

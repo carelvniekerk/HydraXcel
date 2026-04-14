@@ -3,8 +3,6 @@
 # Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2026
-# Group: Dialogue Systems and Machine Learning Group
-# Institution: Heinrich Heine University Düsseldorf
 # --------------------------------------------------------------------------------
 #
 # This code was generated with the help of AI writing assistants
@@ -14,7 +12,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http: //www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,16 +35,22 @@ __all__ = [
 
 
 def find_project_root(current_path: Path, marker: str = "pyproject.toml") -> Path:
-    """Traverse up the directory structure to find the root directory.
+    """Traverse up the directory tree to locate the project root.
+
+    Walks parent directories from *current_path* (skipping the filename if it
+    ends in ``.py``) until it finds a directory that contains *marker*.
 
     Args:
-    ----
-        current_path (Path): The current file path.
-        marker (str): A marker file or directory indicating the root.
+        current_path: Starting path for the search (a file or directory).
+        marker: Filename or directory name that signals the project root
+            (defaults to ``"pyproject.toml"``).
 
     Returns:
-    -------
-        Path: The root directory path.
+        The first ancestor directory that contains *marker*.
+
+    Raises:
+        FileNotFoundError: If *marker* is not found in any parent directory up
+            to the filesystem root.
 
     """
     # Remove the filename if it ends with .py
@@ -77,7 +81,23 @@ def flatten_dict(
     separator: str = ".",
     max_depth: int | None = 5,
 ) -> dict[str, Any]:
-    """Flatten nested dictionaries for MLflow param logging."""
+    """Recursively flatten a nested dictionary into dot-separated keys.
+
+    Joins nested keys with *separator* so that ``{"a": {"b": 1}}`` becomes
+    ``{"a.b": 1}``.  Primarily used to prepare Hydra config dicts for MLflow
+    ``log_params``, which requires a flat ``{str: str}`` mapping.
+
+    Args:
+        dictionary: The (potentially nested) dict to flatten.
+        parent_key: Key prefix accumulated through recursion; leave empty for
+            top-level calls.
+        separator: String inserted between parent and child key segments.
+        max_depth: Maximum recursion depth.  ``None`` means unlimited.
+
+    Returns:
+        A flat ``dict`` with compound ``separator``-joined keys.
+
+    """
     items: dict[str, Any] = {}
     if max_depth is not None and max_depth < 0:
         return items

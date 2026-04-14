@@ -3,8 +3,6 @@
 # Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2026
-# Group: Dialogue Systems and Machine Learning Group
-# Institution: Heinrich Heine University Düsseldorf
 # --------------------------------------------------------------------------------
 #
 # This code was generated with the help of AI writing assistants
@@ -21,7 +19,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Set up logging configuration for project."""
+"""Logging package for HydraXcel.
+
+Exports environment and accelerator diagnostics, structured exception
+handling, experiment-tracking platform initialisation (W&B, MLflow, local),
+Hydra logging configuration, and the MLflow server entry-point.
+"""
 
 from hydraxcel.logging.environment_logging import log_accelerator_info, log_system_info
 from hydraxcel.logging.exception_logging import setup_exception_logging

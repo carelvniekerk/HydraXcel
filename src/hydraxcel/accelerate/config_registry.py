@@ -3,8 +3,6 @@
 # Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2026
-# Group: Dialogue Systems and Machine Learning Group
-# Institution: Heinrich Heine University Düsseldorf
 # --------------------------------------------------------------------------------
 #
 # This code was generated with the help of AI writing assistants
@@ -14,14 +12,19 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http: //www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Accelerate Configuration Registry."""
+"""Accelerate configuration registry for Hydra config groups.
+
+Defines structured-config dataclasses for hardware, compilation, distributed
+training paradigm, and mixed-precision settings, then registers them as named
+Hydra config-group variants via ``load_accelerate_configs``.
+"""
 
 from dataclasses import dataclass, field
 
@@ -149,7 +152,12 @@ AccelerateConfig = hydra_config(
 
 
 def load_accelerate_configs() -> None:
-    """Load accelerate configurations into the config store."""
+    """Register all built-in Accelerate config variants into the Hydra config store.
+
+    Stores the top-level ``AccelerateConfig`` schema and all hardware, compile,
+    paradigm, and mixed-precision sub-group variants so they can be selected via
+    Hydra's config composition (e.g. ``accelerate/paradigm=deepspeed``).
+    """
     config_store.store(
         name="accelerate",
         node=AccelerateConfig,

@@ -3,8 +3,6 @@
 # Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2026
-# Group: Dialogue Systems and Machine Learning Group
-# Institution: Heinrich Heine University Düsseldorf
 # --------------------------------------------------------------------------------
 #
 # This code was generated with the help of AI writing assistants
@@ -14,7 +12,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http: //www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,6 +45,21 @@ def _format_multirun_launch_args(
     script: str,
     launch_args: list[str] | None = None,
 ) -> list[str]:
+    """Format launch override arguments for Hydra multirun mode.
+
+    Prefixes the script path and any additional overrides with ``+launch.``
+    so they are injected into the ``LaunchConfig`` node during a Hydra
+    multirun sweep rather than being treated as passthrough training args.
+
+    Args:
+        script: Posix path of the training script to launch.
+        launch_args: Additional ``key=value`` strings to forward as Hydra
+            overrides under the ``launch`` group.
+
+    Returns:
+        A list of Hydra override strings ready to append to ``sys.argv``.
+
+    """
     formatted_launch_args: list[str] = [f"+launch.script={script}"]
     if launch_args is None:
         return formatted_launch_args
@@ -59,7 +72,21 @@ def _format_multirun_launch_args(
 
 
 def _extract_pass_through_args() -> list[str]:
-    """Extract passthrough arguments from sys.argv."""
+    """Extract passthrough arguments from ``sys.argv`` and sanitise it for Hydra.
+
+    Handles the ``--`` delimiter convention: arguments *before* ``--`` become
+    the passthrough list forwarded to the training script, while arguments
+    *after* ``--`` are left in ``sys.argv`` for Hydra to parse.  When no
+    delimiter is present, all arguments are treated as passthrough.  Multirun
+    flags (``-m`` / ``--multirun``) are stripped from ``sys.argv`` and
+    prepended to the returned list so the caller can detect sweep mode.
+
+    Returns:
+        The list of arguments to forward to the training script (or to Hydra's
+        multirun sweep).  ``sys.argv`` is mutated in-place to contain only
+        what Hydra should see.
+
+    """
     is_multirun: bool = False
     if "-m" in sys.argv:
         sys.argv.pop(sys.argv.index("-m"))
@@ -98,7 +125,29 @@ def launch(
     config_name: str = "accelerate",
     hydra_base_version: str = "1.4",
 ) -> Callable[[LaunchConfig], None]:
-    """Launch a script at a given path."""
+    """Create a Hydra-based Accelerate launcher for *script_path*.
+
+    Returns a ``launch_fn`` decorated with ``@hydra.main`` that, when called,
+    reads an ``AccelerateConfig`` from the Hydra config store, injects
+    *script_path* as the training script, validates and flattens the config,
+    and delegates to ``accelerate.commands.launch.launch_command``.
+
+    Multirun (``-m``) and ``--help`` passthrough flags bypass Accelerate and
+    invoke the script directly via ``uv run``.
+
+    Args:
+        script_path: Absolute path to the Python training script to launch.
+        hydra_configs_dir: Optional path to a directory of YAML config
+            overrides.  Passed to ``@hydra.main(config_path=...)``.
+        config_name: Name of the Hydra config node to load (default
+            ``"accelerate"``).
+        hydra_base_version: Hydra ``version_base`` string (default ``"1.4"``).
+
+    Returns:
+        A Hydra entry-point callable that accepts no positional arguments and
+        reads its configuration from the Hydra config store.
+
+    """
     passthrough_args = _extract_pass_through_args()
 
     _setup_hydra_config_and_logging(

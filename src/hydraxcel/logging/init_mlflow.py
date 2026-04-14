@@ -3,8 +3,6 @@
 # Project: HydraXcel
 # Author: Carel van Niekerk, Benjamin Ruppik
 # Year: 2026
-# Group: Dialogue Systems and Machine Learning Group
-# Institution: Heinrich Heine University Düsseldorf
 # --------------------------------------------------------------------------------
 #
 # This code was generated with the help of AI writing assistants
@@ -21,7 +19,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Initialise the weights and biases logging."""
+"""Initialise MLflow experiment tracking for HydraXcel runs."""
 
 import logging
 from pathlib import Path

@@ -3,8 +3,6 @@
 # Project: HydraXcel
 # Author: Carel van Niekerk, Benjamin Ruppik
 # Year: 2026
-# Group: Dialogue Systems and Machine Learning Group
-# Institution: Heinrich Heine University Düsseldorf
 # --------------------------------------------------------------------------------
 #
 # This code was generated with the help of AI writing assistants
@@ -38,13 +36,14 @@ def setup_exception_logging(
 ) -> None:
     """Set up a custom exception handler that logs uncaught exceptions.
 
-    Args:
-    ----
-        logger: An instance of a logger to be used for logging exceptions.
+    Enables full Hydra tracebacks (``HYDRA_FULL_ERROR=1``), replaces
+    ``sys.excepthook`` with a handler that logs critical-level messages for
+    unhandled exceptions (except ``KeyboardInterrupt``), and redirects Python
+    warnings through the same logger.
 
-    Side effects:
-        - Sets the HYDRA_FULL_ERROR environment variable to "1".
-        - Sets the sys.excepthook to a custom exception handler that logs exceptions.
+    Args:
+        logger: Logger instance to which uncaught exceptions and warnings are
+            written.  Defaults to the module-level ``__main__`` logger.
 
     """
     # Setting this environment variable to "1" makes Hydra print the full stack trace.
@@ -57,21 +56,16 @@ def setup_exception_logging(
         exc_value,  # noqa: ANN001
         exc_traceback,  # noqa: ANN001
     ) -> None:
-        """Handle uncaught exceptions by logging them, except for KeyboardInterrupt.
+        """Log uncaught exceptions at CRITICAL level, except KeyboardInterrupt.
 
-        This function is designed to be compatible with sys.excepthook.
-        Thus, you should not call this function directly, but rather set
-        it as the sys.excepthook. Also make sure you do not change the signature of
-        this function, as it is called by sys.excepthook.
+        Assigned to ``sys.excepthook``; do not call directly.
+        ``KeyboardInterrupt`` is forwarded to the default hook so that Ctrl-C
+        terminates the process cleanly.
 
         Args:
-        ----
-            exc_type:
-                The exception type.
-            exc_value:
-                The exception value.
-            exc_traceback:
-                The traceback object.
+            exc_type: The exception class.
+            exc_value: The exception instance.
+            exc_traceback: The associated traceback object.
 
         """
         if issubclass(
@@ -102,7 +96,20 @@ def setup_exception_logging(
         file=None,  # noqa: ANN001, ARG001
         line=None,  # noqa: ANN001, ARG001
     ) -> None:
-        """Handle warnings by logging them."""
+        """Log a Python warning through the configured logger.
+
+        Signature matches ``warnings.showwarning`` so it can be assigned to
+        ``warnings.showwarning`` directly.
+
+        Args:
+            message: The warning message object.
+            category: The warning category class (e.g. ``DeprecationWarning``).
+            filename: Source file where the warning was issued.
+            lineno: Line number in *filename*.
+            file: Unused (present for ``warnings.showwarning`` compatibility).
+            line: Unused (present for ``warnings.showwarning`` compatibility).
+
+        """
         logger.warning(f"{category.__name__} at {filename}:{lineno}: {message}")  # noqa: G004
 
     sys.excepthook = handle_exception

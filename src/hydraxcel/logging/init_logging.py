@@ -3,8 +3,6 @@
 # Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2026
-# Group: Dialogue Systems and Machine Learning Group
-# Institution: Heinrich Heine University Düsseldorf
 # --------------------------------------------------------------------------------
 #
 # This code was generated with the help of AI writing assistants
@@ -14,7 +12,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http: //www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -65,7 +63,23 @@ def get_logger(
     setup_transformers_logger: bool = True,
     setup_deepspeed_logger: bool = SETUP_DEEPSPEED_LOGGER,
 ) -> logging.Logger:
-    """Get the logger."""
+    """Return a standard Python logger, optionally silencing third-party loggers.
+
+    Clears the handlers of the Transformers and (when available) DeepSpeed
+    loggers and enables propagation so their messages flow through Hydra's
+    configured root handler rather than being emitted twice or swallowed.
+
+    Args:
+        name: Logger name; typically ``__name__`` or a script stem.
+        setup_transformers_logger: When ``True``, redirect the HuggingFace
+            Transformers logger to the root handler.
+        setup_deepspeed_logger: When ``True`` and DeepSpeed is installed,
+            redirect the DeepSpeed logger to the root handler.
+
+    Returns:
+        The ``logging.Logger`` instance for *name*.
+
+    """
     logger: logging.Logger = logging.getLogger(name)
 
     if setup_transformers_logger:
@@ -89,7 +103,25 @@ def init_logging_platform(  # noqa: PLR0913
     job_name: str | None = None,
     accelerator: Accelerator | None = None,
 ) -> None:
-    """Initialize the logging platform."""
+    """Initialise the chosen experiment-tracking platform for the current run.
+
+    No-ops when ``platform`` is ``LOCAL``, when running on a non-main process,
+    when ``ACCELERATE_DEBUG_MODE`` is set, or when a cluster-submission
+    launcher is active (to avoid logging from the sweep coordinator process).
+
+    Args:
+        platform: Which tracking backend to initialise.
+        config: The resolved Hydra run configuration to log as hyperparameters.
+        project_name: Top-level project/experiment name for the tracking
+            platform.
+        task_name: Sub-task or run-type name (appended to *project_name* for
+            W&B; used as the MLflow run name).
+        job_name: Optional run/job name derived from config values (passed to
+            W&B as the run display name).
+        accelerator: The Accelerate ``Accelerator`` instance; used to check
+            whether the current process is the main process.
+
+    """
     if platform == LoggingPlatform.LOCAL:
         return
 

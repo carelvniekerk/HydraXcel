@@ -3,8 +3,6 @@
 # Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2026
-# Group: Dialogue Systems and Machine Learning Group
-# Institution: Heinrich Heine University Düsseldorf
 # --------------------------------------------------------------------------------
 #
 # This code was generated with the help of AI writing assistants
@@ -14,7 +12,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http: //www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -50,7 +48,21 @@ class BaseRegistry[RegistryItemT]:
         name: str,
         **kwargs: object,  # noqa: ARG002
     ) -> RegistryDecorator[RegistryItemT]:
-        """Register an item with a given name."""
+        """Return a decorator that registers a class under *name* in this registry.
+
+        Also stores the class as a named config in the Hydra config store under
+        the registry's group, enabling config-group selection via Hydra
+        composition.
+
+        Args:
+            name: The key under which to register the class.
+            **kwargs: Reserved for future use; currently ignored.
+
+        Returns:
+            A class decorator that registers the decorated class and returns it
+            unchanged.
+
+        """
 
         def decorator(cls: type[RegistryItemT]) -> type[RegistryItemT]:
             self._registry[name] = cls

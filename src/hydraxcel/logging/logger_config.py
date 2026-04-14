@@ -3,8 +3,6 @@
 # Project: HydraXcel
 # Author: Carel van Niekerk
 # Year: 2026
-# Group: Dialogue Systems and Machine Learning Group
-# Institution: Heinrich Heine University Düsseldorf
 # --------------------------------------------------------------------------------
 #
 # This code was generated with the help of AI writing assistants
@@ -32,7 +30,24 @@ def create_logging_config(
     *,
     colorlog_console: bool = True,
 ) -> dict:
-    """Create logging configuration."""
+    """Build a Hydra-compatible ``job_logging`` configuration dictionary.
+
+    Produces a ``logging.config``-style dict with two handlers: a
+    ``StreamHandler`` (optionally coloured via ``colorlog``) that only emits
+    on the main process, and a ``FileHandler`` that writes to *log_file*.
+    Both handlers use the ``MainProcessFilter`` to suppress duplicate output
+    on worker processes in distributed training.
+
+    Args:
+        log_file: Path (Hydra interpolation string) for the per-run log file.
+        log_level: Root logger level (e.g. ``"INFO"``, ``"DEBUG"``).
+        colorlog_console: When ``True``, the console handler uses
+            ``colorlog.ColoredFormatter`` for colour-coded level output.
+
+    Returns:
+        A ``dict`` suitable for passing to ``HydraConf(job_logging=...)``.
+
+    """
     if colorlog_console:
         color_format: str = (
             "%(light_black)s[%(asctime)s]%(reset)s "
