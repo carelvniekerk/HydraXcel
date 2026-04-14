@@ -18,13 +18,13 @@
 
 - **UV-Friendly Launching:** HydraXcel is designed to work well with the **UV** workflow. Its launcher allows you to define **“uv run” scripts** for your experiments easily. For example, your `pyproject.toml` can define an entry point for training and one for launching an MLflow server:
 
-  ```toml
-  [project.scripts]
-  train = "project_name.scripts:train_command"
-  mlflow_server = "hydraxcel.logging:run_mlflow_server"
-  ```
+    ```toml
+    [project.scripts]
+    train = "project_name.scripts:train_command"
+    mlflow_server = "hydraxcel.logging:run_mlflow_server"
+    ```
 
-With this setup, running experiments or servers is as easy as typing:  
+With this setup, running experiments or servers is as easy as typing:
 
 ```bash
 uv run train
@@ -42,14 +42,14 @@ HydraXcel can be included in your project as a git submodule/source. It is sugge
 hydraxcel = { git = "https://github.com/carelvniekerk/HydraXcel" }
 ```
 
-*(Requires Python 3.13+; currently version 0.1.0a).*
+_(Requires Python 3.13+; currently version 0.1.0a)._
 
 ## Usage Guide
 
-1. **Define your configuration** – either as a dataclass in Python or as YAML files.  
-2. **Wrap your main function** with HydraXcel’s decorator (`hydraxcel_main`).  
-3. **Run your experiment** with Python or UV CLI.  
-4. **(Optional) Use `launch` for distributed training with Accelerate.**  
+1. **Define your configuration** – either as a dataclass in Python or as YAML files.
+2. **Wrap your main function** with HydraXcel’s decorator (`hydraxcel_main`).
+3. **Run your experiment** with Python or UV CLI.
+4. **(Optional) Use `launch` for distributed training with Accelerate.**
 5. **(Optional) Launch MLflow tracking server.**
 
 ### 1. Using a Dataclass Config
@@ -81,18 +81,19 @@ def main(cfg):
     print(f"Training for {cfg.epochs} epochs on batch size {cfg.batch_size}...")
 ```
 
-- `@hydraxcel_main` registers the config, parses overrides, sets up logging, and creates structured output directories.  
-- Logging is automatically configured (to WandB, MLflow, or local logs).  
-- **Note:** `hydraxcel_main` does *not* initialise an `Accelerator`. Use the `launch` function if you need distributed training.
+- `@hydraxcel_main` registers the config, parses overrides, sets up logging, and creates structured output directories.
+- Logging is automatically configured (to WandB, MLflow, or local logs).
+- **Note:** `hydraxcel_main` does _not_ initialise an `Accelerator`. Use the `launch` function if you need distributed training.
 
 **Run examples:**
+
 ```bash
 uv run train
 uv run train learning_rate=0.0005 batch_size=64 model.type="ResNet101"
 uv run train -m epochs=5,10,20
 ```
 
-*(Using the train script defined in the `pyproject.toml`.)*
+_(Using the train script defined in the `pyproject.toml`.)_
 
 ### 2. Using YAML Configs
 
@@ -102,8 +103,8 @@ epochs: 10
 batch_size: 32
 learning_rate: 0.001
 model:
-  type: "ResNet50"
-  pretrained: true
+    type: "ResNet50"
+    pretrained: true
 ```
 
 ```python
@@ -121,6 +122,7 @@ def main(cfg):
 ```
 
 Run:
+
 ```bash
 python train.py
 python train.py learning_rate=0.0005 model.type="ResNet101"
@@ -144,12 +146,14 @@ launch_train = launch(
 ```
 
 Add in `pyproject.toml`:
+
 ```toml
 [project.scripts]
 myproject-train = "myproject.scripts:launch_train"
 ```
 
 Run with UV:
+
 ```bash
 uv run myproject-train -- accelerate.num_processes=4
 ```
@@ -166,11 +170,13 @@ mlflow_server = "hydraxcel.logging:run_mlflow_server"
 ```
 
 Run:
+
 ```bash
 uv run mlflow_server
 ```
 
 Server at [http://127.0.0.1:5000](http://127.0.0.1:5000). Override with:
+
 ```bash
 uv run mlflow_server host=0.0.0.0 port=8080
 ```
@@ -181,4 +187,4 @@ HydraXcel is released under the **Apache License 2.0**. This permissive licence 
 
 ---
 
-*HydraXcel is a work in progress (v0.1.0a). This README currently serves as the main documentation. Contributions welcome!* 🚀
+_HydraXcel is a work in progress (v0.1.0a). This README currently serves as the main documentation. Contributions welcome!_ 🚀
