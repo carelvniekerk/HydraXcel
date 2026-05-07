@@ -28,7 +28,7 @@ dev = ["pytest-cov>=6.2.1"]
 tests = "pytest:main"
 
 [build-system]
-requires = ["uv_build>=0.11.6,<0.12.0"]
+requires = ["uv_build>=0.11.11,<0.12.0"]
 build-backend = "uv_build"
 
 # Configuration for Pytest
