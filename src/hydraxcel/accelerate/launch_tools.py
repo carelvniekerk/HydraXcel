@@ -65,6 +65,7 @@ def _format_multirun_launch_args(
         return formatted_launch_args
     for arg in launch_args:
         arg_name, arg_value = arg.split("=", 1)
+        arg_name = "PLUS_" + arg_name[1:] if arg_name.startswith("+") else arg_name
         delimiter = "." if "/" not in arg_name else "/"
         arg_name = delimiter.join(["+launch", arg_name])
         formatted_launch_args.append(f"{arg_name}={arg_value}")
